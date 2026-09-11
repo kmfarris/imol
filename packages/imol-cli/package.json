@@ -1,0 +1,19 @@
+{
+  "name": "@imol/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "imol": "./dist/cli.js"
+  },
+  "main": "./dist/cli.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@imol/check": "0.1.0",
+    "@imol/fmt": "0.1.0",
+    "@imol/run": "0.1.0",
+    "@imol/syntax": "0.1.0",
+    "@imol/workshop": "0.1.0"
+  }
+}

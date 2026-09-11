@@ -1,0 +1,24 @@
+module workshop_read @id("ws-read-1")
+
+workshop
+  allow_net false
+  bind std.io
+  bind tools.filesystem
+end
+
+import std.io as io
+
+type Result = Ok Text | Err Text
+
+tool read_file from tools.filesystem.read @io
+  { path: Text } -> Result
+
+@io
+function main() -> Unit
+  let content Text = match invoke read_file { path: "examples/hello.imol" }
+    Ok text -> text
+    Err msg -> fail(msg)
+  end
+  io.println(content)
+  return ()
+end

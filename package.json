@@ -1,0 +1,19 @@
+{
+  "name": "imol",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @imol/syntax -w @imol/fmt -w @imol/check -w @imol/run -w @imol/workshop -w @imol/cli",
+    "test": "vitest run --no-file-parallelism",
+    "check": "npm run build && vitest run",
+    "imol": "node packages/imol-cli/dist/cli.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

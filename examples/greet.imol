@@ -1,0 +1,23 @@
+module greet @id("greet-1")
+
+import std.io as io
+
+type Result = Ok Text | Err Text
+
+@io
+function greet(name Text) -> Result
+  if name == ""
+    return Err("name required")
+  end
+  io.println("Hello, " ++ name)
+  return Ok("done")
+end
+
+@io
+function main() -> Unit
+  match greet("Ada")
+    Ok _ -> ()
+    Err msg -> fail(msg)
+  end
+  return ()
+end
