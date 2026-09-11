@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const hello = readFileSync(
-    join(dirname(fileURLToPath(import.meta.url)), "../../../../examples/hello.imol"),
+    join(dirname(fileURLToPath(import.meta.url)), "../../../examples/hello.imol"),
     "utf8",
 );
 
