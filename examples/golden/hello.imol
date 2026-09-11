@@ -1,0 +1,9 @@
+module hello @id("hello-1")
+
+import std.io as io
+
+@io
+function main() -> Unit
+  io.println("Hello, IMOL")
+  return ()
+end

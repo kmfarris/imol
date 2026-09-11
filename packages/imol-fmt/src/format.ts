@@ -104,12 +104,15 @@ function formatStmt(s: Stmt, indent: string): string {
                     : "";
             return `${indent}if ${formatExpr(s.cond, indent)}\n${thenLines}\n${indent}end${elseLines}`;
         }
+        case "run_plan":
+            return `${indent}run plan`;
     }
 }
 
 function formatWorkshop(w: WorkshopDecl, indent: string): string {
     const lines = [`${indent}workshop`];
     lines.push(`${indent}  allow_net ${w.allowNet ? "true" : "false"}`);
+    lines.push(`${indent}  allow_write ${w.allowWrite ? "true" : "false"}`);
     for (const b of w.binds) {
         lines.push(`${indent}  bind ${b}`);
     }
@@ -139,7 +142,7 @@ function formatFunction(f: FunctionDecl): string {
 }
 
 function formatTypeDecl(t: TypeDecl): string {
-    return `type ${t.name} = ${formatType(t.definition)}`;
+    return formatAttrs(t.attrs) + `type ${t.name} = ${formatType(t.definition)}`;
 }
 
 export function formatModule(m: ModuleDecl): string {
@@ -153,6 +156,10 @@ export function formatModule(m: ModuleDecl): string {
     }
     for (const i of m.imports) parts.push(formatImport(i));
     if (m.imports.length) parts.push("");
+    for (const p of m.plans ?? []) {
+        const inv = p.invokes.map((e) => `  ${formatExpr(e, "  ")}`).join("\n");
+        parts.push(`plan\n${inv}\nend`, "");
+    }
     for (const t of m.tools) parts.push(formatTool(t), "");
     for (const t of m.types) parts.push(formatTypeDecl(t), "");
     for (const f of m.functions) parts.push(formatFunction(f), "");

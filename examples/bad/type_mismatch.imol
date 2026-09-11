@@ -1,0 +1,6 @@
+module bad_types
+
+function main() -> Unit
+  let x Int = "not an int"
+  return ()
+end

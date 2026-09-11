@@ -4,6 +4,7 @@ import std.io as io
 
 type Result = Ok Text | Err Text
 
+@id("greet-fn")
 @io
 function greet(name Text) -> Result
   if name == ""

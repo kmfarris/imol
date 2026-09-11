@@ -1,0 +1,13 @@
+---
+description: IMOL agent workflow — check, patch, workshop plan before edits
+globs: "**/*.imol"
+alwaysApply: false
+---
+
+# IMOL agent loop
+
+1. Run `npm run imol -- agent check [file.imol]` (or manifest entry) before proposing IMOL edits. Fix diagnostics first.
+2. Prefer `imol agent patch` / `imol patch` with `@id` targets over hand-editing whole modules. See `examples/agent/patch-greet.json`.
+3. Before suggesting filesystem or tool side effects, run `imol agent workshop-plan [file.imol]` and review `trace`.
+4. Do not pass `--approve` on `imol run` or `imol workshop` unless the user explicitly asked to execute side effects.
+5. Machine JSON schemas: `packages/imol-spec/agent-api.json`, spec_version 0.3 in `packages/imol-spec/SPEC.md`.

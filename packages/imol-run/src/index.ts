@@ -1,6 +1,17 @@
-export { createDefaultExterns, type ExternRegistry, type ExternHandler } from "./externs.js";
+export {
+    capabilitiesFromWorkshop,
+    defaultCapabilities,
+    type Capabilities,
+} from "./capabilities.js";
+export {
+    createDefaultExterns,
+    createExternRegistry,
+    type ExternRegistry,
+    type ExternHandler,
+} from "./externs.js";
 export {
     runModule,
+    runPlanDryRun,
     ImolRuntimeError,
     type RunOptions,
     type TraceEntry,

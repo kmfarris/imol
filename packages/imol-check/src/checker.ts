@@ -8,6 +8,8 @@ import type {
     Stmt,
     TypeExpr,
 } from "@imol/syntax";
+import { isExternAllowed, KNOWN_EXTERN_KEYS } from "@imol/syntax";
+import { attachDeclIds } from "./enrich.js";
 import { CheckResult, type Diagnostic } from "./diagnostic.js";
 
 type Type =
@@ -63,6 +65,8 @@ function builtin(name: string): Type | undefined {
             return { kind: "int" };
         case "Text":
             return { kind: "text" };
+        case "Never":
+            return { kind: "named", name: "Never" };
         default:
             return undefined;
     }
@@ -85,6 +89,20 @@ function typeToString(t: Type): string {
         case "sum":
             return "Sum";
     }
+}
+
+function isNever(t: Type): boolean {
+    return t.kind === "named" && t.name === "Never";
+}
+
+function typeCompatible(expected: Type, got: Type): boolean {
+    if (isNever(got)) return true;
+    return typesEqual(expected, got);
+}
+
+function matchArmTypesAgree(a: Type, b: Type): boolean {
+    if (isNever(a) || isNever(b)) return true;
+    return typesEqual(a, b);
 }
 
 function typesEqual(a: Type, b: Type): boolean {
@@ -137,9 +155,33 @@ export type CheckOptions = {
     allowHoles?: boolean;
 };
 
+function collectNameCollisions(mod: ModuleDecl, diags: Diagnostic[]): void {
+    const groups: { items: { name: string; span: import("@imol/syntax").Span }[]; label: string }[] =
+        [
+            { items: mod.tools, label: "tool" },
+            { items: mod.functions, label: "function" },
+            { items: mod.types, label: "type" },
+        ];
+    for (const { items, label } of groups) {
+        const seen = new Set<string>();
+        for (const item of items) {
+            if (seen.has(item.name)) {
+                diags.push({
+                    code: "E_IMPORT_COLLISION",
+                    message: `Duplicate ${label} name '${item.name}'`,
+                    span: item.span,
+                    hint: "Rename declarations so imported names do not collide.",
+                });
+            }
+            seen.add(item.name);
+        }
+    }
+}
+
 export function checkModule(mod: ModuleDecl, options: CheckOptions = {}): CheckResult {
     const diags: Diagnostic[] = [];
     let hasHoles = false;
+    collectNameCollisions(mod, diags);
     const aliases = new Map<string, Type>();
     for (const td of mod.types) {
         aliases.set(td.name, resolveType(td.definition, aliases));
@@ -156,6 +198,27 @@ export function checkModule(mod: ModuleDecl, options: CheckOptions = {}): CheckR
             effect: effectFromAttrs(tool.attrs),
             from: tool.from,
         });
+        if (!KNOWN_EXTERN_KEYS.has(tool.from)) {
+            diags.push({
+                code: "E_EXTERN",
+                message: `Unknown extern key '${tool.from}' on tool ${tool.name}`,
+                span: tool.span,
+                hint: "Use a bundled key such as std.fs.read (see spec).",
+            });
+        } else if (
+            mod.workshop &&
+            !isExternAllowed(tool.from, {
+                binds: mod.workshop.binds,
+                allowWrite: mod.workshop.allowWrite,
+            })
+        ) {
+            diags.push({
+                code: "E_EXTERN",
+                message: `Extern '${tool.from}' not allowed by workshop bind list`,
+                span: tool.span,
+                hint: "Add bind std.fs (or matching prefix) to workshop.",
+            });
+        }
     }
 
     const imports = new Map<string, string>();
@@ -189,7 +252,7 @@ export function checkModule(mod: ModuleDecl, options: CheckOptions = {}): CheckR
                 effect = maxEffect(effect, t.effect);
                 hasHolesLocal = t.hasHoles;
                 const bound = expected ?? t.type;
-                if (expected && !typesEqual(t.type, expected)) {
+                if (expected && !typeCompatible(expected, t.type)) {
                     diags.push({
                         code: "E_TYPE",
                         message: `let ${stmt.name}: expected ${typeToString(expected)}, got ${typeToString(t.type)}`,
@@ -204,7 +267,7 @@ export function checkModule(mod: ModuleDecl, options: CheckOptions = {}): CheckR
                 const t = checkExpr(stmt.value, env);
                 effect = t.effect;
                 hasHolesLocal = t.hasHoles;
-                if (!typesEqual(t.type, ret)) {
+                if (!typeCompatible(ret, t.type)) {
                     diags.push({
                         code: "E_RETURN",
                         message: `return: expected ${typeToString(ret)}, got ${typeToString(t.type)}`,
@@ -217,6 +280,14 @@ export function checkModule(mod: ModuleDecl, options: CheckOptions = {}): CheckR
                 const t = checkExpr(stmt.value, env, ret);
                 effect = t.effect;
                 hasHolesLocal = t.hasHoles;
+                break;
+            }
+            case "run_plan": {
+                diags.push({
+                    code: "W_RUN_PLAN",
+                    message: "run plan requires workshop approval at runtime",
+                    span: stmt.span,
+                });
                 break;
             }
             case "if_block": {
@@ -484,7 +555,7 @@ export function checkModule(mod: ModuleDecl, options: CheckOptions = {}): CheckR
                     const b = checkExpr(arm.body, envArm, expected);
                     effect = maxEffect(effect, b.effect);
                     if (!armType) armType = b.type;
-                    else if (!typesEqual(armType, b.type)) {
+                    else if (!matchArmTypesAgree(armType, b.type)) {
                         diags.push({
                             code: "E_MATCH",
                             message: "match arms must agree on type",
@@ -512,7 +583,7 @@ export function checkModule(mod: ModuleDecl, options: CheckOptions = {}): CheckR
             case "fail": {
                 const m = checkExpr(expr.message, env);
                 return {
-                    type: expected ?? { kind: "text" },
+                    type: { kind: "named", name: "Never" },
                     effect: m.effect,
                     hasHoles: m.hasHoles,
                 };
@@ -596,10 +667,24 @@ export function checkModule(mod: ModuleDecl, options: CheckOptions = {}): CheckR
         void bodyEffect;
     }
 
+    for (const plan of mod.plans ?? []) {
+        for (const inv of plan.invokes) {
+            if (inv.kind !== "invoke") {
+                diags.push({
+                    code: "E_PLAN",
+                    message: "Plan may only contain invoke expressions",
+                    span: inv.span,
+                });
+                continue;
+            }
+            checkExpr(inv, new Map());
+        }
+    }
+
     for (const fn of mod.functions) {
         checkFunction(fn);
     }
 
     const ok = diags.filter((d) => d.code.startsWith("E_")).length === 0 && (options.allowHoles || !hasHoles);
-    return new CheckResult(ok, diags, hasHoles);
+    return new CheckResult(ok, attachDeclIds(mod, diags), hasHoles);
 }

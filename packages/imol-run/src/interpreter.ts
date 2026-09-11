@@ -1,18 +1,62 @@
-import type { Expr, FunctionDecl, ModuleDecl, Stmt } from "@imol/syntax";
+import type { Attribute, Expr, FunctionDecl, ModuleDecl, Stmt } from "@imol/syntax";
+import type { Capabilities } from "./capabilities.js";
 import type { ExternRegistry } from "./externs.js";
 import { type Value, valueToString } from "./value.js";
 
 export type RunOptions = {
     dryRun?: boolean;
+    planApproved?: boolean;
+    capabilities?: Capabilities;
     onTrace?: (entry: TraceEntry) => void;
 };
 
 export type TraceEntry = {
+    ts: number;
     kind: "invoke" | "extern" | "io";
     name: string;
-    dryRun: boolean;
+    tool?: string;
+    extern?: string;
+    args_digest?: string;
+    effect?: string;
+    dry_run: boolean;
+    result_kind?: string;
     detail?: string;
 };
+
+function effectFromAttrs(attrs: Attribute[]): string {
+    for (const a of attrs) {
+        if (a.name === "@net") return "net";
+        if (a.name === "@unsafe") return "unsafe";
+        if (a.name === "@io") return "io";
+    }
+    return "pure";
+}
+
+function digestRecord(fields: { name: string; value: Expr }[]): string {
+    return fields.map((f) => f.name).sort().join(",");
+}
+
+function emitTrace(options: RunOptions, entry: Omit<TraceEntry, "ts" | "dry_run">): void {
+    options.onTrace?.({
+        ...entry,
+        ts: Date.now(),
+        dry_run: options.dryRun ?? false,
+    });
+}
+
+function assertEffect(options: RunOptions, effect: string): void {
+    const caps = options.capabilities;
+    if (!caps) return;
+    if (effect === "net" && !caps.net) {
+        throw new ImolRuntimeError("effect net not allowed");
+    }
+    if (effect === "unsafe" && !caps.unsafe) {
+        throw new ImolRuntimeError("effect unsafe not allowed");
+    }
+    if (effect === "io" && !caps.io) {
+        throw new ImolRuntimeError("effect io not allowed");
+    }
+}
 
 export class ImolRuntimeError extends Error {
     constructor(message: string) {
@@ -21,25 +65,52 @@ export class ImolRuntimeError extends Error {
     }
 }
 
-export async function runModule(
-    mod: ModuleDecl,
-    externs: ExternRegistry,
-    options: RunOptions = {},
-): Promise<Value> {
+function moduleMaps(mod: ModuleDecl): {
+    fns: Map<string, FunctionDecl>;
+    tools: Map<string, import("@imol/syntax").ToolDecl>;
+} {
     const fns = new Map<string, FunctionDecl>();
     for (const f of mod.functions) {
         fns.set(f.name, f);
     }
     const tools = new Map(mod.tools.map((t) => [t.name, t]));
+    return { fns, tools };
+}
+
+/** Dry-run plan invokes only (no main). Used by workshop plan-first flow. */
+export async function runPlanDryRun(
+    mod: ModuleDecl,
+    externs: ExternRegistry,
+    options: RunOptions = {},
+): Promise<void> {
+    const plan = mod.plans[0];
+    if (!plan) {
+        return;
+    }
+    const { fns, tools } = moduleMaps(mod);
+    const env = new Map<string, Value>();
+    const planOpts: RunOptions = { ...options, dryRun: true };
+    for (const inv of plan.invokes) {
+        await evalExpr(inv, env, mod, fns, tools, externs, planOpts);
+    }
+}
+
+export async function runModule(
+    mod: ModuleDecl,
+    externs: ExternRegistry,
+    options: RunOptions = {},
+): Promise<Value> {
+    const { fns, tools } = moduleMaps(mod);
     const main = fns.get("main");
     if (!main) {
         throw new ImolRuntimeError("No function main() found");
     }
-    return evalFunction(main, fns, tools, externs, options, new Map(), []);
+    return evalFunction(main, mod, fns, tools, externs, options, new Map(), []);
 }
 
 async function evalFunction(
     fn: FunctionDecl,
+    mod: ModuleDecl,
     fns: Map<string, FunctionDecl>,
     tools: Map<string, import("@imol/syntax").ToolDecl>,
     externs: ExternRegistry,
@@ -56,7 +127,7 @@ async function evalFunction(
         env.set(p.name, v);
     });
     for (const stmt of fn.body) {
-        const r = await evalStmt(stmt, env, fns, tools, externs, options, fn);
+        const r = await evalStmt(stmt, env, mod, fns, tools, externs, options, fn);
         if (r.type === "return") {
             return r.value;
         }
@@ -69,6 +140,7 @@ type StmtResult = { type: "normal"; value: Value } | { type: "return"; value: Va
 async function evalStmt(
     stmt: Stmt,
     env: Map<string, Value>,
+    mod: ModuleDecl,
     fns: Map<string, FunctionDecl>,
     tools: Map<string, import("@imol/syntax").ToolDecl>,
     externs: ExternRegistry,
@@ -76,30 +148,43 @@ async function evalStmt(
     fn: FunctionDecl,
 ): Promise<StmtResult> {
     switch (stmt.kind) {
+        case "run_plan": {
+            if (!options.planApproved) {
+                throw new ImolRuntimeError("run plan blocked: not approved (use --approve)");
+            }
+            const plan = mod.plans[0];
+            if (!plan) {
+                throw new ImolRuntimeError("no plan block in module");
+            }
+            for (const inv of plan.invokes) {
+                await evalExpr(inv, env, mod, fns, tools, externs, options);
+            }
+            return { type: "normal", value: { kind: "unit" } };
+        }
         case "if_block": {
-            const c = await evalExpr(stmt.cond, env, fns, tools, externs, options);
+            const c = await evalExpr(stmt.cond, env, mod, fns, tools, externs, options);
             if (c.kind !== "bool") throw new ImolRuntimeError("if condition must be Bool");
             const branch = c.value ? stmt.then : stmt.else;
             for (const s of branch) {
-                const r = await evalStmt(s, env, fns, tools, externs, options, fn);
+                const r = await evalStmt(s, env, mod, fns, tools, externs, options, fn);
                 if (r.type === "return") return r;
             }
             return { type: "normal", value: { kind: "unit" } };
         }
         case "let": {
-            const v = await evalExpr(stmt.value, env, fns, tools, externs, options);
+            const v = await evalExpr(stmt.value, env, mod, fns, tools, externs, options);
             env.set(stmt.name, v);
             return { type: "normal", value: v };
         }
         case "return":
             return {
                 type: "return",
-                value: await evalExpr(stmt.value, env, fns, tools, externs, options),
+                value: await evalExpr(stmt.value, env, mod, fns, tools, externs, options),
             };
         case "expr":
             return {
                 type: "normal",
-                value: await evalExpr(stmt.value, env, fns, tools, externs, options),
+                value: await evalExpr(stmt.value, env, mod, fns, tools, externs, options),
             };
     }
 }
@@ -107,6 +192,7 @@ async function evalStmt(
 async function evalExpr(
     expr: Expr,
     env: Map<string, Value>,
+    mod: ModuleDecl,
     fns: Map<string, FunctionDecl>,
     tools: Map<string, import("@imol/syntax").ToolDecl>,
     externs: ExternRegistry,
@@ -133,7 +219,7 @@ async function evalExpr(
         case "record": {
             const fields = new Map<string, Value>();
             for (const f of expr.fields) {
-                fields.set(f.name, await evalExpr(f.value, env, fns, tools, externs, options));
+                fields.set(f.name, await evalExpr(f.value, env, mod, fns, tools, externs, options));
             }
             return { kind: "record", fields };
         }
@@ -142,13 +228,13 @@ async function evalExpr(
                 return {
                     kind: "variant",
                     name: expr.name,
-                    payload: await evalExpr(expr.payload, env, fns, tools, externs, options),
+                    payload: await evalExpr(expr.payload, env, mod, fns, tools, externs, options),
                 };
             }
             return { kind: "variant", name: expr.name };
         case "binary": {
-            const l = await evalExpr(expr.left, env, fns, tools, externs, options);
-            const r = await evalExpr(expr.right, env, fns, tools, externs, options);
+            const l = await evalExpr(expr.left, env, mod, fns, tools, externs, options);
+            const r = await evalExpr(expr.right, env, mod, fns, tools, externs, options);
             if (expr.op === "concat") {
                 if (l.kind !== "text" || r.kind !== "text") {
                     throw new ImolRuntimeError("++ requires Text");
@@ -167,48 +253,52 @@ async function evalExpr(
             return { kind: "bool", value: false };
         }
         case "if": {
-            const c = await evalExpr(expr.cond, env, fns, tools, externs, options);
+            const c = await evalExpr(expr.cond, env, mod, fns, tools, externs, options);
             if (c.kind !== "bool") throw new ImolRuntimeError("if condition must be Bool");
             return c.value
-                ? evalExpr(expr.then, env, fns, tools, externs, options)
-                : evalExpr(expr.else, env, fns, tools, externs, options);
+                ? evalExpr(expr.then, env, mod, fns, tools, externs, options)
+                : evalExpr(expr.else, env, mod, fns, tools, externs, options);
         }
         case "match": {
-            const s = await evalExpr(expr.scrutinee, env, fns, tools, externs, options);
+            const s = await evalExpr(expr.scrutinee, env, mod, fns, tools, externs, options);
             if (s.kind !== "variant") throw new ImolRuntimeError("match on non-variant");
             for (const arm of expr.arms) {
                 if (arm.pattern.kind === "wildcard") {
-                    return evalExpr(arm.body, env, fns, tools, externs, options);
+                    return evalExpr(arm.body, env, mod, fns, tools, externs, options);
                 }
                 if (arm.pattern.kind === "variant" && arm.pattern.name === s.name) {
                     const env2 = new Map(env);
                     if (arm.pattern.bind && s.payload) {
                         env2.set(arm.pattern.bind, s.payload);
                     }
-                    return evalExpr(arm.body, env2, fns, tools, externs, options);
+                    return evalExpr(arm.body, env2, mod, fns, tools, externs, options);
                 }
             }
             throw new ImolRuntimeError(`No match arm for ${s.name}`);
         }
         case "fail": {
-            const m = await evalExpr(expr.message, env, fns, tools, externs, options);
+            const m = await evalExpr(expr.message, env, mod, fns, tools, externs, options);
             throw new ImolRuntimeError(m.kind === "text" ? m.value : valueToString(m));
         }
         case "call":
-            return evalCall(expr.callee, expr.args, env, fns, tools, externs, options);
+            return evalCall(expr.callee, expr.args, env, mod, fns, tools, externs, options);
         case "invoke": {
             const tool = tools.get(expr.tool);
             if (!tool) throw new ImolRuntimeError(`Unknown tool ${expr.tool}`);
+            const effect = effectFromAttrs(tool.attrs);
+            assertEffect(options, effect);
             const fields = new Map<string, Value>();
             for (const f of expr.fields) {
-                fields.set(f.name, await evalExpr(f.value, env, fns, tools, externs, options));
+                fields.set(f.name, await evalExpr(f.value, env, mod, fns, tools, externs, options));
             }
             const argRecord: Value = { kind: "record", fields };
-            options.onTrace?.({
+            emitTrace(options, {
                 kind: "invoke",
                 name: expr.tool,
-                dryRun: options.dryRun ?? false,
-                detail: tool.from,
+                tool: expr.tool,
+                extern: tool.from,
+                args_digest: digestRecord(expr.fields),
+                effect,
             });
             if (options.dryRun) {
                 return { kind: "variant", name: "Ok", payload: { kind: "text", value: "" } };
@@ -217,8 +307,15 @@ async function evalExpr(
             if (!handler) {
                 throw new ImolRuntimeError(`No extern registered for ${tool.from}`);
             }
-            options.onTrace?.({ kind: "extern", name: tool.from, dryRun: false });
-            return handler([argRecord]);
+            const result = await handler([argRecord]);
+            emitTrace(options, {
+                kind: "extern",
+                name: tool.from,
+                extern: tool.from,
+                effect,
+                result_kind: result.kind === "variant" ? result.name : result.kind,
+            });
+            return result;
         }
     }
 }
@@ -227,6 +324,7 @@ async function evalCall(
     callee: Expr,
     args: Expr[],
     env: Map<string, Value>,
+    mod: ModuleDecl,
     fns: Map<string, FunctionDecl>,
     tools: Map<string, import("@imol/syntax").ToolDecl>,
     externs: ExternRegistry,
@@ -234,10 +332,16 @@ async function evalCall(
 ): Promise<Value> {
     if (callee.kind === "field" && callee.field === "println") {
         const arg: Value = args[0]
-            ? await evalExpr(args[0], env, fns, tools, externs, options)
+            ? await evalExpr(args[0], env, mod, fns, tools, externs, options)
             : { kind: "unit" };
         const text = arg.kind === "text" ? arg.value : valueToString(arg);
-        options.onTrace?.({ kind: "io", name: "println", dryRun: options.dryRun ?? false, detail: text });
+        assertEffect(options, "io");
+        emitTrace(options, {
+            kind: "io",
+            name: "println",
+            effect: "io",
+            detail: text,
+        });
         if (!options.dryRun) {
             console.log(text);
         }
@@ -248,9 +352,9 @@ async function evalCall(
         if (fn) {
             const argValues: Value[] = [];
             for (const a of args) {
-                argValues.push(await evalExpr(a, env, fns, tools, externs, options));
+                argValues.push(await evalExpr(a, env, mod, fns, tools, externs, options));
             }
-            return evalFunction(fn, fns, tools, externs, options, env, argValues);
+            return evalFunction(fn, mod, fns, tools, externs, options, env, argValues);
         }
     }
     throw new ImolRuntimeError("Unsupported call");

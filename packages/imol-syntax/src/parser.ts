@@ -10,6 +10,8 @@ import type {
     ToolDecl,
     TypeDecl,
     TypeExpr,
+    PlanDecl,
+    Span,
     WorkshopDecl,
 } from "./ast.js";
 import { ImolSyntaxError } from "./errors.js";
@@ -50,7 +52,10 @@ class Parser {
         const start = this.peek().span;
         this.expect("module", "Expected 'module' at start of file");
         const nameTok = this.expect("ident", "Expected module name");
-        const attrs = this.parseAttributes();
+        const attrs: Attribute[] =
+            this.at("at") && this.peek().span.line === nameTok.span.line
+                ? this.parseAttributes()
+                : [];
 
         let workshop: WorkshopDecl | undefined;
         if (this.at("workshop")) {
@@ -61,12 +66,21 @@ class Parser {
         const tools: ToolDecl[] = [];
         const types: TypeDecl[] = [];
         const functions: FunctionDecl[] = [];
+        const plans: PlanDecl[] = [];
 
         while (!this.at("eof")) {
             if (this.at("import")) imports.push(this.parseImport());
+            else if (this.at("plan")) plans.push(this.parsePlan());
             else if (this.at("tool")) tools.push(this.parseTool());
             else if (this.at("type")) types.push(this.parseTypeDecl());
-            else if (this.at("function") || this.at("at")) functions.push(this.parseFunction());
+            else if (this.at("at")) {
+                const attrs = this.parseAttributes();
+                if (this.at("type")) {
+                    types.push(this.finishTypeDecl(attrs));
+                } else {
+                    functions.push(this.finishFunctionDecl(attrs));
+                }
+            } else if (this.at("function")) functions.push(this.parseFunction());
             else {
                 throw new ImolSyntaxError(
                     `Unexpected token '${this.peek().lexeme}' at module level`,
@@ -80,12 +94,26 @@ class Parser {
             name: nameTok.lexeme,
             attrs,
             ...(workshop ? { workshop } : {}),
+            plans,
             imports,
             tools,
             types,
             functions,
             span: { ...start, end: nameTok.span.end },
         };
+    }
+
+    private parsePlan(): PlanDecl {
+        const t = this.expect("plan", "Expected 'plan'");
+        const invokes: Expr[] = [];
+        while (!this.at("end")) {
+            if (!this.at("invoke")) {
+                throw new ImolSyntaxError("Plan body may only contain invoke expressions", this.peek().span);
+            }
+            invokes.push(this.parseExpr());
+        }
+        this.expect("end", "Expected 'end' to close plan");
+        return { kind: "plan", invokes, span: t.span };
     }
 
     private parseAttributes(): Attribute[] {
@@ -110,6 +138,7 @@ class Parser {
     private parseWorkshop(): WorkshopDecl {
         const t = this.expect("workshop", "Expected 'workshop'");
         let allowNet = false;
+        let allowWrite = false;
         const binds: string[] = [];
         while (!this.at("end")) {
             if (this.at("allow_net")) {
@@ -123,15 +152,26 @@ class Parser {
                 } else {
                     throw new ImolSyntaxError("Expected true or false after allow_net", this.peek().span);
                 }
+            } else if (this.at("allow_write")) {
+                this.advance();
+                if (this.at("true")) {
+                    this.advance();
+                    allowWrite = true;
+                } else if (this.at("false")) {
+                    this.advance();
+                    allowWrite = false;
+                } else {
+                    throw new ImolSyntaxError("Expected true or false after allow_write", this.peek().span);
+                }
             } else if (this.at("bind")) {
                 this.advance();
                 binds.push(this.parseDottedPath());
             } else {
-                throw new ImolSyntaxError("Expected allow_net, bind, or end in workshop", this.peek().span);
+                throw new ImolSyntaxError("Expected allow_net, allow_write, bind, or end in workshop", this.peek().span);
             }
         }
         this.expect("end", "Expected 'end' to close workshop");
-        return { kind: "workshop", allowNet, binds, span: t.span };
+        return { kind: "workshop", allowNet, allowWrite, binds, span: t.span };
     }
 
     private parseDottedPath(): string {
@@ -186,11 +226,18 @@ class Parser {
     }
 
     private parseTypeDecl(): TypeDecl {
+        return this.finishTypeDecl(this.parseAttributes());
+    }
+
+    private finishTypeDecl(attrs: Attribute[]): TypeDecl {
         const t = this.expect("type", "Expected 'type'");
         const name = this.expect("ident", "Expected type name").lexeme;
         this.expect("eq", "Expected '=' in type declaration");
         const definition = this.parseTypeExpr();
-        return { kind: "type", name, definition, span: t.span };
+        const span: Span = attrs.length
+            ? { ...attrs[0]!.span, end: definition.span.end }
+            : { ...t.span, end: definition.span.end };
+        return { kind: "type", name, definition, attrs, span };
     }
 
     private parseTypeExpr(): TypeExpr {
@@ -257,7 +304,10 @@ class Parser {
     }
 
     private parseFunction(): FunctionDecl {
-        const attrs = this.parseAttributes();
+        return this.finishFunctionDecl(this.parseAttributes());
+    }
+
+    private finishFunctionDecl(attrs: Attribute[]): FunctionDecl {
         const fnStart = this.expect("function", "Expected 'function'");
         const name = this.expect("ident", "Expected function name").lexeme;
         this.expect("lparen", "Expected '(' after function name");
@@ -276,6 +326,9 @@ class Parser {
         const returnType = this.parseTypeExpr();
         const body = this.parseBlockStmts();
         this.expect("end", "Expected 'end' to close function");
+        const span: Span = attrs.length
+            ? { ...attrs[0]!.span, end: body.length ? body[body.length - 1]!.span.end : fnStart.span.end }
+            : { ...fnStart.span, end: body.length ? body[body.length - 1]!.span.end : fnStart.span.end };
         return {
             kind: "function",
             name,
@@ -283,7 +336,7 @@ class Parser {
             returnType,
             body,
             attrs,
-            span: fnStart.span,
+            span,
         };
     }
 
@@ -314,6 +367,10 @@ class Parser {
             } else if (this.at("return")) {
                 const t = this.advance();
                 stmts.push({ kind: "return", value: this.parseExpr(), span: t.span });
+            } else if (this.at("run")) {
+                const t = this.advance();
+                this.expect("plan", "Expected 'plan' after run");
+                stmts.push({ kind: "run_plan", span: t.span });
             } else if (this.at("if")) {
                 const t = this.advance();
                 const cond = this.parseExpr();

@@ -1,0 +1,21 @@
+module entry_with_tools @id("entry-tools")
+
+workshop
+  allow_net false
+  allow_write false
+  bind std.fs
+  bind std.io
+end
+
+import tools.fs as fs
+import std.io as io
+
+@io
+function main() -> Unit
+  let content Text = match invoke read_file { path: "examples/hello.imol" }
+    Ok text -> text
+    Err msg -> fail(msg)
+  end
+  io.println(content)
+  return ()
+end

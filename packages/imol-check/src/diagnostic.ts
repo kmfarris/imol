@@ -5,6 +5,7 @@ export type Diagnostic = {
     message: string;
     span: Span;
     hint?: string;
+    decl_id?: string;
 };
 
 export class CheckResult {

@@ -1,0 +1,24 @@
+module plan_demo @id("plan-demo")
+
+workshop
+  allow_net false
+  allow_write false
+  bind std.fs
+end
+
+import std.io as io
+
+type Result = Ok Text | Err Text
+
+tool read from std.fs.read @io
+  { path: Text } -> Result
+
+plan
+  invoke read { path: "examples/hello.imol" }
+end
+
+@io
+function main() -> Unit
+  run plan
+  return ()
+end

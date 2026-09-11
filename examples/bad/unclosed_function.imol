@@ -1,0 +1,4 @@
+module bad_unclosed
+
+function main() -> Unit
+  return ()

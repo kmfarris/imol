@@ -2,13 +2,17 @@
   "name": "imol",
   "private": true,
   "type": "module",
+  "bin": {
+    "imol": "packages/imol-cli/dist/cli.js"
+  },
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w @imol/syntax -w @imol/fmt -w @imol/check -w @imol/run -w @imol/workshop -w @imol/cli",
+    "build": "npm run build -w @imol/syntax -w @imol/fmt -w @imol/check -w @imol/patch -w @imol/load -w @imol/run -w @imol/workshop -w @imol/cli",
     "test": "vitest run --no-file-parallelism",
-    "check": "npm run build && vitest run",
+    "conformance": "npm run build && node scripts/conformance.mjs",
+    "check": "npm run build && vitest run && npm run conformance",
     "imol": "node packages/imol-cli/dist/cli.js"
   },
   "devDependencies": {

@@ -1,0 +1,9 @@
+{
+  "patches": [
+    {
+      "op": "replace_decl_by_id",
+      "id": "greet-fn",
+      "source": "@io\nfunction greet(name Text) -> Result\n  if name == \"\"\n    return Err(\"name required\")\n  end\n  return Ok(\"agent-patched\")\nend"
+    }
+  ]
+}

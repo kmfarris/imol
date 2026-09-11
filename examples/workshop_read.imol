@@ -3,14 +3,14 @@ module workshop_read @id("ws-read-1")
 workshop
   allow_net false
   bind std.io
-  bind tools.filesystem
+  bind std.fs
 end
 
 import std.io as io
 
 type Result = Ok Text | Err Text
 
-tool read_file from tools.filesystem.read @io
+tool read_file from std.fs.read @io
   { path: Text } -> Result
 
 @io

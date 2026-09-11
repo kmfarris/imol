@@ -45,7 +45,8 @@ export type Stmt =
     | { kind: "let"; name: string; type?: TypeExpr; value: Expr; span: Span }
     | { kind: "return"; value: Expr; span: Span }
     | { kind: "expr"; value: Expr; span: Span }
-    | { kind: "if_block"; cond: Expr; then: Stmt[]; else: Stmt[]; span: Span };
+    | { kind: "if_block"; cond: Expr; then: Stmt[]; else: Stmt[]; span: Span }
+    | { kind: "run_plan"; span: Span };
 
 export type FunctionDecl = {
     kind: "function";
@@ -61,6 +62,7 @@ export type TypeDecl = {
     kind: "type";
     name: string;
     definition: TypeExpr;
+    attrs: Attribute[];
     span: Span;
 };
 
@@ -84,7 +86,14 @@ export type ImportDecl = {
 export type WorkshopDecl = {
     kind: "workshop";
     allowNet: boolean;
+    allowWrite: boolean;
     binds: string[];
+    span: Span;
+};
+
+export type PlanDecl = {
+    kind: "plan";
+    invokes: Expr[];
     span: Span;
 };
 
@@ -93,6 +102,7 @@ export type ModuleDecl = {
     name: string;
     attrs: Attribute[];
     workshop?: WorkshopDecl;
+    plans: PlanDecl[];
     imports: ImportDecl[];
     tools: ToolDecl[];
     types: TypeDecl[];

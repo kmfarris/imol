@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "IMOL patch list v0.2",
+  "type": "object",
+  "required": ["patches"],
+  "properties": {
+    "patches": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": ["op", "id", "source"],
+            "properties": {
+              "op": { "const": "replace_decl_by_id" },
+              "id": { "type": "string" },
+              "source": { "type": "string", "description": "Full IMOL declaration text (function/type/tool block)" }
+            }
+          },
+          {
+            "type": "object",
+            "required": ["op", "id", "source"],
+            "properties": {
+              "op": { "const": "insert_after_id" },
+              "id": { "type": "string" },
+              "source": { "type": "string" }
+            }
+          },
+          {
+            "type": "object",
+            "required": ["op", "id"],
+            "properties": {
+              "op": { "const": "delete_decl_by_id" },
+              "id": { "type": "string" }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

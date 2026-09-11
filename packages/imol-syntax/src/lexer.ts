@@ -20,6 +20,9 @@ export type TokenKind =
     | "fail"
     | "bind"
     | "allow_net"
+    | "allow_write"
+    | "plan"
+    | "run"
     | "true"
     | "false"
     | "at"
@@ -67,6 +70,9 @@ const KEYWORDS: Record<string, TokenKind> = {
     fail: "fail",
     bind: "bind",
     allow_net: "allow_net",
+    allow_write: "allow_write",
+    plan: "plan",
+    run: "run",
     true: "true",
     false: "false",
 };
