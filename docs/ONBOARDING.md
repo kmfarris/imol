@@ -70,9 +70,11 @@ Use project [`.cursor/mcp.json`](../.cursor/mcp.json) only. Remove duplicate **i
 
 ## 8. Publish
 
-See [PUBLISH.md](PUBLISH.md). Root `package.json` stays `private: true` until you cut a release; tag `v*` runs `npm pack --dry-run` in CI.
+See [PUBLISH.md](PUBLISH.md). Root `package.json` stays `private: true` until you cut a release.
 
-CI runs tests, conformance, `npm run skill:dataset` (trajectories must match committed `packages/imol-skill/data/oracle-trajectories.jsonl`), and `node scripts/mcp-smoke.mjs` after build.
+## Local verify (no GitHub Actions)
+
+See [LOCAL_VERIFY.md](LOCAL_VERIFY.md). Typical pre-push: `npm run check` and `npm run mcp:smoke`.
 
 ## CSD router train (optional)
 
@@ -90,7 +92,7 @@ Train sparse router weights (writes `packages/imol-skill/codebook/router-weights
 npm run skill:train
 ```
 
-On GitHub: **Actions → Skill train → Run workflow**, then download the **router-weights** artifact. CI does not push weights to the repo automatically.
+Weights stay local unless you commit `router-weights.json` yourself.
 
 ## Security
 

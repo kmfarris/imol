@@ -13,10 +13,10 @@ Library packages (`@imol/syntax`, `@imol/check`, `@imol/run`, …) are dependenc
 
 ## Before first publish
 
-1. Remove `"private": true` from the **root** `package.json` only when you intend to publish from CI; keep `"private": true` until then.
+1. Remove `"private": true` from the **root** `package.json` only when you intend to publish; keep `"private": true` until then.
 2. Ensure each publish package has `name`, `version`, `files` or default `dist/`, and `repository` if desired.
 3. Run `npm run build` and `npm run check`.
-4. Dry-run pack (CI does this on version tags):
+4. Dry-run pack locally before tagging:
 
 ```bash
 npm run build
@@ -53,9 +53,9 @@ For Cursor, prefer a small launcher that sets `IMOL_WORKSPACE_ROOT` (same patter
 
 After publish, verify `imol-mcp` resolves to `dist/mcp/server.js` in the packed tarball.
 
-## CI (tags)
+## Before you tag
 
-Workflow [`.github/workflows/npm-pack.yml`](../.github/workflows/npm-pack.yml) runs `npm pack` on `v*` tags. It does **not** upload to npm unless you add a guarded job with `NPM_TOKEN` and manual approval.
+Run pack dry-run locally (see [LOCAL_VERIFY.md](LOCAL_VERIFY.md)). This repo does not run GitHub Actions on tags.
 
 ## Version coupling
 
