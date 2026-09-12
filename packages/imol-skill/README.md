@@ -32,6 +32,9 @@ npx imol-mcp
 | `imol_agent_fmt_check` | Canonical fmt comparison |
 | `imol_agent_patch` | Dry-run patch + nested check |
 | `imol_agent_workshop_plan` | Dry-run plan trace (no `--approve`) |
+| `imol_agent_loop` | Full prepare → edit → check → workshop-plan loop (JSON) |
+
+Headless / CI loop: [docs/AGENT_AUTOMATION.md](../../docs/AGENT_AUTOMATION.md).
 
 ### Resources
 

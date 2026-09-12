@@ -68,13 +68,9 @@ imol-mcp
 
 Use project [`.cursor/mcp.json`](../.cursor/mcp.json) only. Remove duplicate **imol** / **user-imol** entries from global `~/.cursor/mcp.json` if Cursor lists two servers.
 
-## 8. Publish (future)
+## 8. Publish
 
-Packages are workspace-local today (`private: true` root). To publish:
-
-1. Bump versions in `packages/imol-cli`, `@imol/skill`, and dependencies together.
-2. `npm publish -w @imol/cli --access public` (after removing `private` on the package).
-3. Document `imol-mcp` bin from `@imol/skill` and the stable launcher pattern in `scripts/imol-mcp.mjs`.
+See [PUBLISH.md](PUBLISH.md). Root `package.json` stays `private: true` until you cut a release; tag `v*` runs `npm pack --dry-run` in CI.
 
 CI runs tests, conformance, `npm run skill:dataset` (trajectories must match committed `packages/imol-skill/data/oracle-trajectories.jsonl`), and `node scripts/mcp-smoke.mjs` after build.
 

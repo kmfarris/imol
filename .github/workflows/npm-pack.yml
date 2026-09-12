@@ -1,0 +1,21 @@
+name: npm pack
+
+# Dry-run pack on version tags. Does not publish to npm (no NPM_TOKEN job).
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm ci
+      - run: npm run build
+      - run: npm pack -w @imol/cli --dry-run
+      - run: npm pack -w @imol/skill --dry-run

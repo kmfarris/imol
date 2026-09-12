@@ -1,0 +1,64 @@
+# Publishing IMOL packages
+
+Monorepo workspace packages share semver **0.1.x** today. Bump **all** `@imol/*` dependencies together before release.
+
+## Publish targets
+
+| Package | npm name | Bin |
+|---------|----------|-----|
+| CLI | `@imol/cli` | `imol` |
+| Skill + MCP | `@imol/skill` | `imol-mcp` |
+
+Library packages (`@imol/syntax`, `@imol/check`, `@imol/run`, …) are dependencies of the two publish targets. Publish them in dependency order if you split releases; for a first release, publishing CLI + skill with pinned workspace versions is enough if consumers install only those bins.
+
+## Before first publish
+
+1. Remove `"private": true` from the **root** `package.json` only when you intend to publish from CI; keep `"private": true` until then.
+2. Ensure each publish package has `name`, `version`, `files` or default `dist/`, and `repository` if desired.
+3. Run `npm run build` and `npm run check`.
+4. Dry-run pack (CI does this on version tags):
+
+```bash
+npm run build
+npm pack -w @imol/cli --dry-run
+npm pack -w @imol/skill --dry-run
+```
+
+## Consumer install
+
+```bash
+npx @imol/cli check path/to/file.imol
+```
+
+MCP without cloning the repo:
+
+```bash
+npx @imol/skill
+# bin: imol-mcp (stdio MCP server)
+```
+
+For Cursor, prefer a small launcher that sets `IMOL_WORKSPACE_ROOT` (same pattern as [`scripts/imol-mcp.mjs`](../scripts/imol-mcp.mjs)):
+
+```json
+{
+  "mcpServers": {
+    "imol": {
+      "command": "npx",
+      "args": ["-y", "@imol/skill"],
+      "env": { "IMOL_WORKSPACE_ROOT": "${workspaceFolder}" }
+    }
+  }
+}
+```
+
+After publish, verify `imol-mcp` resolves to `dist/mcp/server.js` in the packed tarball.
+
+## CI (tags)
+
+Workflow [`.github/workflows/npm-pack.yml`](../.github/workflows/npm-pack.yml) runs `npm pack` on `v*` tags. It does **not** upload to npm unless you add a guarded job with `NPM_TOKEN` and manual approval.
+
+## Version coupling
+
+- Root `package.json` `bin.imol` points at built CLI for local dev; published `@imol/cli` uses its own `bin` field.
+- `@imol/cli` depends on `@imol/skill@0.1.0` (etc.); bump in lockstep.
+- Codebook files ship inside `@imol/skill`; run `npm run codebook:build -w @imol/skill` before pack.
