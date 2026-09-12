@@ -6,8 +6,16 @@ alwaysApply: false
 
 # IMOL agent loop
 
-1. Run `npm run imol -- agent check [file.imol]` (or manifest entry) before proposing IMOL edits. Fix diagnostics first.
-2. Prefer `imol agent patch` / `imol patch` with `@id` targets over hand-editing whole modules. See `examples/agent/patch-greet.json`.
-3. Before suggesting filesystem or tool side effects, run `imol agent workshop-plan [file.imol]` and review `trace`.
-4. Do not pass `--approve` on `imol run` or `imol workshop` unless the user explicitly asked to execute side effects.
-5. Machine JSON schemas: `packages/imol-spec/agent-api.json`, spec_version 0.3 in `packages/imol-spec/SPEC.md`.
+When MCP **imol** is available, use oracle tools (paths under workspace root):
+
+1. `imol_skill_prepare` — task + optional `examples/dogfood/catalog.imol` (dogfood) or target file.
+2. Edit IMOL or `imol_agent_patch` with `@id` (e.g. `dogfood-main` in dogfood). See `examples/agent/patch-greet.json`.
+3. `imol_agent_check` — fix diagnostics before proposing further edits.
+4. `imol_agent_workshop_plan` — review `trace` before side effects.
+5. Do **not** use MCP for `run --approve`; terminal only when the user asked to execute.
+
+CLI fallback: `npm run imol -- agent check`, `agent patch`, `agent workshop-plan`.
+
+Dogfood reference: `docs/HAPPY_PATH.md`, `examples/dogfood/catalog.imol`.
+
+Machine JSON: `packages/imol-spec/agent-api.json`, spec_version 0.3 in `packages/imol-spec/SPEC.md`.

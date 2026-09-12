@@ -1,0 +1,27 @@
+module dogfood_catalog @id("dogfood-app")
+
+workshop
+  allow_net false
+  allow_write false
+  bind std.fs
+  bind std.io
+end
+
+import tools.fs as fs
+import std.io as io
+
+plan
+  invoke read_file { path: "examples/greet.imol" }
+  invoke read_file { path: "examples/hello.imol" }
+end
+
+@id("dogfood-main")
+@io
+function main() -> Unit
+  match invoke read_file { path: "examples/greet.imol" }
+    Ok _ -> io.println("dogfood: greet.imol ok")
+    Err msg -> fail(msg)
+  end
+  run plan
+  return ()
+end

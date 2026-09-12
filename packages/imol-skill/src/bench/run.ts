@@ -6,6 +6,7 @@ import { loadCodebook } from "../codebook/load.js";
 import { estimateTokens } from "../compiler/packet.js";
 import { loadRouterWeights } from "../router/weights.js";
 import { routeSkills } from "../router/route.js";
+import { runLlmBench } from "./llm-runner.js";
 
 const pkgRoot = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const repoRoot = join(pkgRoot, "../..");
@@ -55,6 +56,8 @@ async function main(): Promise<void> {
     const spec = await readFile(specPath, "utf8");
     const sampleRoute = routeSkills(codebook, { task: raw.scenarios[0]!.task, k: 5 }, weights);
 
+    const llm = await runLlmBench(3);
+
     const report = {
         spec_version: "0.3",
         codeword_recall_at_5: recallTotal ? recallHits / recallTotal : 0,
@@ -65,9 +68,11 @@ async function main(): Promise<void> {
             C_full_spec: { token_estimate: estimateTokens(spec) },
             D_csd_k5: { token_estimate: sampleRoute.token_estimate },
         },
+        llm_eval: llm,
         metrics_doc: {
-            check_pass_at_1: "Requires LLM eval; use oracle loop in production",
-            patch_valid_at_1: "Requires LLM eval",
+            check_pass_at_1: llm.skipped ? "Set IMOL_AGENTBENCH_API_KEY to measure" : "From llm_eval",
+            check_pass_at_3: llm.skipped ? "Set IMOL_AGENTBENCH_API_KEY to measure" : "From llm_eval",
+            patch_valid_at_1: "Future: patch JSON tasks in llm-scenarios.json",
             loop_compliance: "Enforced via tool_policy in packet",
         },
     };

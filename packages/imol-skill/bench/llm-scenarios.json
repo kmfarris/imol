@@ -1,0 +1,15 @@
+{
+  "spec_version": "0.3",
+  "tasks": [
+    {
+      "id": "greet_ok",
+      "file": "examples/greet.imol",
+      "prompt": "Return the full IMOL source unchanged; module must check clean."
+    },
+    {
+      "id": "hello_ok",
+      "file": "examples/hello.imol",
+      "prompt": "Return the full IMOL source unchanged; module must check clean."
+    }
+  ]
+}

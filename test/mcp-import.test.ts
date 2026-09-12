@@ -19,6 +19,7 @@ describe("mcp import", () => {
                 }),
             ),
         );
+        expect(imol).toContain("bind tools.mcp");
         expect(imol).toContain("tool search from mcp.search");
         expect(imol).toContain("query: Text");
     });

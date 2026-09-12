@@ -16,6 +16,7 @@
     "test": "vitest run --no-file-parallelism",
     "conformance": "npm run build && node scripts/conformance.mjs",
     "check": "npm run build && vitest run && npm run conformance",
+    "mcp:smoke": "node scripts/mcp-smoke.mjs",
     "imol": "node packages/imol-cli/dist/cli.js"
   },
   "devDependencies": {

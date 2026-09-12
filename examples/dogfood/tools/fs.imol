@@ -1,0 +1,6 @@
+module tools_fs @id("dogfood-tools-fs")
+
+tool read_file from std.fs.read @io
+  { path: Text } -> Result
+
+type Result = Ok Text | Err Text

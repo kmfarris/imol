@@ -6,7 +6,7 @@ Host-side flat codebook + router + packet compiler for closed-model APIs. Replac
 
 ```bash
 npm run imol -- skill route "patch greet by id" --file examples/greet.imol --k 5
-npm run skill:bench
+npm run skill:bench   # codeword recall + llm_eval (skipped without API key)
 npm run skill:train   # synth oracle trajectories + train router weights
 npm run imol -- skill mcp   # stdio MCP server (official SDK)
 # or after build:
@@ -47,6 +47,20 @@ npx imol-mcp
 5. Do **not** expose `run --approve` via MCP unless explicitly added later.
 
 Paths must resolve under `IMOL_WORKSPACE_ROOT`.
+
+Dogfood walkthrough: [docs/HAPPY_PATH.md](../../docs/HAPPY_PATH.md).
+
+### AgentBench LLM metrics
+
+`skill:bench` reports `llm_eval.check_pass_at_1` / `check_pass_at_3` when:
+
+```bash
+export IMOL_AGENTBENCH_API_KEY=...   # or OPENAI_API_KEY
+export IMOL_AGENTBENCH_MODEL=gpt-4o-mini   # optional
+npm run skill:bench
+```
+
+Without a key, `llm_eval.skipped` is true (CI-safe).
 
 ## Layout
 

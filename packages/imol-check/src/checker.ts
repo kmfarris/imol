@@ -8,7 +8,7 @@ import type {
     Stmt,
     TypeExpr,
 } from "@imol/syntax";
-import { isExternAllowed, KNOWN_EXTERN_KEYS } from "@imol/syntax";
+import { isExternAllowed, isKnownExternKey } from "@imol/syntax";
 import { attachDeclIds } from "./enrich.js";
 import { CheckResult, type Diagnostic } from "./diagnostic.js";
 
@@ -198,12 +198,12 @@ export function checkModule(mod: ModuleDecl, options: CheckOptions = {}): CheckR
             effect: effectFromAttrs(tool.attrs),
             from: tool.from,
         });
-        if (!KNOWN_EXTERN_KEYS.has(tool.from)) {
+        if (!isKnownExternKey(tool.from)) {
             diags.push({
                 code: "E_EXTERN",
                 message: `Unknown extern key '${tool.from}' on tool ${tool.name}`,
                 span: tool.span,
-                hint: "Use a bundled key such as std.fs.read (see spec).",
+                hint: "Use std.fs.*, tools.filesystem.*, or mcp.* with bind tools.mcp.",
             });
         } else if (
             mod.workshop &&

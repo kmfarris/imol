@@ -25,7 +25,16 @@ function jsonTypeToImol(prop: { type?: string } | undefined): string {
 }
 
 export function mcpToImolTools(exportJson: McpExport): string {
-    const lines: string[] = ["module mcp_generated @id(\"mcp-generated\")", ""];
+    const lines: string[] = [
+        "module mcp_generated @id(\"mcp-generated\")",
+        "",
+        "workshop",
+        "  allow_net false",
+        "  allow_write false",
+        "  bind tools.mcp",
+        "end",
+        "",
+    ];
     lines.push("type Result = Ok Text | Err Text", "");
     for (const tool of exportJson.tools) {
         const props = tool.inputSchema?.properties ?? {};

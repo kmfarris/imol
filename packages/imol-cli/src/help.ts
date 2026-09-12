@@ -12,6 +12,7 @@ Commands:
   tools import <json>    Generate tool stubs from MCP export
   agent <subcmd>         Machine JSON API for agents (see spec agent-api.json)
   skill <subcmd>         IMOL skill dictionary route / MCP host
+  lsp                    Stdio language server (check diagnostics on open/save)
 
 Global:
   imol --help            This message

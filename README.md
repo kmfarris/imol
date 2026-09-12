@@ -2,21 +2,33 @@
 
 LLM-native language and live **Workshop** runtime: typed tools, effect checks, audit trace.
 
-## Quick start
+## Quick start (5 minutes)
 
 ```bash
 npm install
 npm run build
-npm run imol -- run examples/hello.imol
 npm run imol -- check examples/greet.imol
+npm run imol -- agent check examples/dogfood/catalog.imol
+```
+
+Configure Cursor MCP from [`.cursor/mcp.json`](.cursor/mcp.json), reload tools, then call **`imol_skill_prepare`** on `examples/greet.imol`. Full dogfood + MCP loop: **[docs/HAPPY_PATH.md](docs/HAPPY_PATH.md)** and **[docs/ONBOARDING.md](docs/ONBOARDING.md)**.
+
+More examples:
+
+```bash
+npm run imol -- run examples/hello.imol
 npm run imol -- workshop examples/workshop_read.imol --dry-run
 npm run imol -- check --json examples/greet.imol
 npm run imol -- run examples/plan_demo.imol --approve
+npm run imol -- run examples/dogfood/catalog.imol --approve
 npm run conformance
-npm run imol -- agent check examples/greet.imol
 ```
 
 ## Agent loop (Cursor)
+
+Prefer MCP oracle tools when the **imol** server is green: `imol_skill_prepare` → edit / `imol_agent_patch` → `imol_agent_check` → `imol_agent_workshop_plan`.
+
+CLI equivalents:
 
 1. `imol agent check [file]` — JSON diagnostics before editing IMOL.
 2. `imol agent patch <file> <patches.json>` — apply patches in memory; verify nested `check`.

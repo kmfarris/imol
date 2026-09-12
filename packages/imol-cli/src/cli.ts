@@ -275,6 +275,10 @@ async function main(): Promise<number> {
             console.error("Usage: imol skill route|mcp ...");
             return 2;
         }
+        if (cmd === "lsp") {
+            await import("./lsp.js");
+            return await new Promise<number>(() => {});
+        }
         switch (cmd) {
             case "check":
                 return cmdCheck(args[1], flags.has("--allow-holes"), flags.has("--json"));

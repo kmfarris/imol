@@ -13,7 +13,18 @@ export const EXTERN_CATALOG: ExternMeta[] = [
     { key: "tools.filesystem.read", effect: "io", binds: ["tools.filesystem", "std.fs"] },
 ];
 
+/** Workshop bind required for tools generated via `imol tools import` (`from mcp.*`). */
+export const MCP_EXTERN_BIND = "tools.mcp";
+
 export const KNOWN_EXTERN_KEYS = new Set(EXTERN_CATALOG.map((e) => e.key));
+
+export function isMcpExternKey(key: string): boolean {
+    return key.startsWith("mcp.");
+}
+
+export function isKnownExternKey(key: string): boolean {
+    return KNOWN_EXTERN_KEYS.has(key) || isMcpExternKey(key);
+}
 
 export function allowedExternKeys(binds: string[], allowWrite: boolean): Set<string> {
     const allowed = new Set<string>();
@@ -39,8 +50,14 @@ export function isExternAllowed(
     key: string,
     workshop: { binds: string[]; allowWrite: boolean } | undefined,
 ): boolean {
-    if (!KNOWN_EXTERN_KEYS.has(key)) {
+    if (!isKnownExternKey(key)) {
         return false;
+    }
+    if (isMcpExternKey(key)) {
+        if (!workshop) {
+            return true;
+        }
+        return workshop.binds.includes(MCP_EXTERN_BIND) || workshop.binds.includes("mcp");
     }
     if (!workshop) {
         return true;

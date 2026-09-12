@@ -14,3 +14,4 @@ jobs:
           node-version: "22"
       - run: npm ci
       - run: npm run check
+      - run: node scripts/mcp-smoke.mjs
