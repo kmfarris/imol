@@ -35,8 +35,8 @@ npx imol-mcp
 
 ### Resources
 
-- `imol://codebook/v0.3` — codeword id list
-- `imol://codebook/v0.3/{id}` — one codeword expansion
+- `imol://codebook/v0.4` — codeword id list
+- `imol://codebook/v0.4/{id}` — one codeword expansion
 
 ### Recommended agent loop (MCP)
 
@@ -64,7 +64,7 @@ Without a key, `llm_eval.skipped` is true (CI-safe).
 
 ## Layout
 
-- `codebook/v0.3.json` — flat codeword table (built via `npm run codebook:build -w @imol/skill`)
+- `codebook/v0.4.json` — flat codeword table (built via `npm run codebook:build -w @imol/skill`)
 - `codebook/codebook-schema.json` — JSON schema
 - `codebook/router-weights.json` — trained sparse router (after `skill:train`)
 - `bench/scenarios.json` — IMOL-AgentBench scenarios + baseline definitions
@@ -73,4 +73,4 @@ Without a key, `llm_eval.skipped` is true (CI-safe).
 
 ## Spec
 
-Pinned to IMOL `spec_version` **0.3**. Regenerate codebook when spec bumps.
+Pinned to IMOL `spec_version` **0.4**. Regenerate codebook when spec bumps.

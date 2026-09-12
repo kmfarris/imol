@@ -1,4 +1,4 @@
-# IMOL spec_version 0.3
+# IMOL spec_version 0.4
 
 IMOL is a language for LLM-authored programs and tool orchestration. Canonical formatted source is the IR.
 
@@ -13,6 +13,8 @@ module <name> [@id("uuid")]...
 <types>*
 <functions>*
 ```
+
+Module-level `@id` must not appear immediately before a `plan` block (parser treats `@id` as starting a function). Use `@id` on functions, tools, types, or the module line.
 
 ## Workshop
 
@@ -45,6 +47,8 @@ tool <name> from <extern.key> [@io|@net|@pure]...
 
 Bundled extern keys include `std.fs.read`, `std.fs.list`, `std.fs.write` (write requires `allow_write true`).
 
+Dynamic **MCP** tools use `from mcp.<toolName>` and require `bind tools.mcp` (or `bind mcp`) in the workshop block. Generate stubs with `imol tools import`.
+
 ## Patch format
 
 See [patch-schema.json](patch-schema.json). CLI: `imol patch file.imol patches.json [--write]`.
@@ -61,7 +65,15 @@ Operations: `replace_decl_by_id`, `insert_after_id`, `delete_decl_by_id`.
 
 ## MCP tool import
 
-`imol tools import mcp.json [out.imol]` generates IMOL tool stubs from an exported MCP tool list (offline JSON).
+`imol tools import mcp.json [out.imol]` generates IMOL tool stubs from an exported MCP tool list (offline JSON), including a workshop block with `bind tools.mcp`.
+
+## Language server
+
+`imol lsp` runs a stdio LSP that publishes `checkModule` diagnostics on open/save for `*.imol` files (multi-file via import merge on disk).
+
+## Agent output (grammar v2 thin)
+
+`imol agent sanitize [file.imol] [--write]` or `imol agent sanitize --stdin` strips markdown fences, normalizes newlines, and parse→fmt before check. Project hook: `.cursor/hooks/imol-after-imol-edit.mjs` on agent `Write` of `*.imol`.
 
 ## Types
 
@@ -73,12 +85,13 @@ Operations: `replace_decl_by_id`, `insert_after_id`, `delete_decl_by_id`.
 
 `@pure`, `@io`, `@net`, `@unsafe` on functions and tools. Runtime enforces workshop and capability flags.
 
-## Agent API (spec_version 0.3)
+## Agent API (spec_version 0.4)
 
-Cursor and other agents should use `imol agent` subcommands. Responses are JSON on stdout with `spec_version: "0.3"`. Schema: [agent-api.json](agent-api.json).
+Cursor and other agents should use `imol agent` subcommands or MCP oracle tools. Responses are JSON on stdout with `spec_version: "0.4"`. Schema: [agent-api.json](agent-api.json).
 
 - `imol agent check [file.imol]` — same as `check --json`, plus `entry` path
 - `imol agent fmt-check <file.imol>` — `{ ok, changed }` after parse → fmt → compare
+- `imol agent sanitize <file.imol> [--write]` / `--stdin` — post-filter LLM output, optional nested `check`
 - `imol agent patch <file.imol> <patches.json>` — apply in memory; `{ output, check }` (does not write)
 - `imol agent workshop-plan [file.imol]` — dry-run workshop; `{ trace, state, trace_path }`
 
@@ -93,3 +106,4 @@ Failures emit `{ ok: false, error, spec_version }` on stdout for agent subcomman
 - `imol workshop [file.imol] [--dry-run] [--approve]`
 - `imol workshop trace [file.jsonl]`
 - `imol tools import mcp.json [out.imol]`
+- `imol lsp` — stdio language server

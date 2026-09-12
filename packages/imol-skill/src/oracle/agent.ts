@@ -1,13 +1,13 @@
 import { checkModule, diagnosticsToJson } from "@imol/check";
-import { formatModule } from "@imol/fmt";
+import { formatModule, sanitizeAndFormat } from "@imol/fmt";
 import { loadModuleFromFile } from "@imol/load";
 import { applyPatches, parsePatchFile } from "@imol/patch";
 import { parse, type ModuleDecl } from "@imol/syntax";
 import { WorkshopSession } from "@imol/workshop";
 import { dirname, resolve } from "node:path";
-import { readFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 
-export const AGENT_SPEC_VERSION = "0.3";
+export const AGENT_SPEC_VERSION = "0.4";
 
 export type AgentError = { ok: false; error: string; spec_version: string };
 
@@ -37,6 +37,46 @@ export async function agentCheck(
         entry: abs,
         spec_version: AGENT_SPEC_VERSION,
     };
+}
+
+export async function agentSanitize(source: string): Promise<object> {
+    const sanitized = sanitizeAndFormat(source);
+    if (!sanitized.ok) {
+        return {
+            ok: false,
+            output: sanitized.output,
+            steps: sanitized.steps,
+            parse_error: sanitized.parse_error,
+            spec_version: AGENT_SPEC_VERSION,
+        };
+    }
+    const mod = parse(sanitized.output);
+    const check = checkModule(mod);
+    return {
+        ok: check.ok,
+        output: sanitized.output,
+        steps: sanitized.steps,
+        check: {
+            ok: check.ok,
+            diagnostics: diagnosticsToJson(check.diagnostics),
+        },
+        spec_version: AGENT_SPEC_VERSION,
+    };
+}
+
+export async function agentSanitizeFile(
+    sourcePath: string,
+    write: boolean,
+): Promise<object> {
+    const abs = resolve(sourcePath);
+    const source = await readFile(abs, "utf8");
+    const body = await agentSanitize(source);
+    const out = (body as { output?: string }).output;
+    if (write && out !== undefined && out !== source) {
+        await writeFile(abs, out, "utf8");
+        return { ...body, wrote: true };
+    }
+    return body;
 }
 
 export async function agentFmtCheck(sourcePath: string): Promise<object> {

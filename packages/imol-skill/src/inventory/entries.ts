@@ -1,6 +1,6 @@
 import type { Codeword } from "../types.js";
 
-const V = "0.3";
+const V = "0.4";
 
 /** Raw codeword inventory (no embeddings). ~55 atomic IMOL skills. */
 export const CODewORD_ENTRIES: Omit<Codeword, "embedding">[] = [
@@ -132,7 +132,7 @@ export const CODewORD_ENTRIES: Omit<Codeword, "embedding">[] = [
         tags: ["agent", "check"],
         keywords: ["agent check", "diagnostics", "json", "ok"],
         expansion:
-            "`imol agent check [file]` → JSON `{ ok, has_holes, diagnostics, entry, spec_version: \"0.3\" }` on stdout.",
+            "`imol agent check [file]` → JSON `{ ok, has_holes, diagnostics, entry, spec_version: \"0.4\" }` on stdout.",
         tool_policy: ["Use imol agent check and fix diagnostics before next edit."],
     },
     {
@@ -166,7 +166,7 @@ export const CODewORD_ENTRIES: Omit<Codeword, "embedding">[] = [
         spec_version: V,
         tags: ["agent", "spec"],
         keywords: ["spec_version", "0.3", "agent-api"],
-        expansion: "All agent stdout JSON includes `spec_version: \"0.3\"`. Schema: packages/imol-spec/agent-api.json.",
+        expansion: "All agent stdout JSON includes `spec_version: \"0.4\"`. Schema: packages/imol-spec/agent-api.json.",
         tool_policy: [],
     },
     {
@@ -260,7 +260,7 @@ export const CODewORD_ENTRIES: Omit<Codeword, "embedding">[] = [
         tags: ["extern", "tool"],
         keywords: ["extern", "catalog", "std.fs", "from"],
         expansion:
-            "Bundled extern keys: std.fs.read, std.fs.list, std.fs.write (write needs allow_write), tools.filesystem.read. Unknown keys → E_EXTERN at check.",
+            "Bundled extern keys: std.fs.*, tools.filesystem.read. Dynamic `mcp.*` keys allowed when workshop includes `bind tools.mcp`. Unknown keys → E_EXTERN.",
         tool_policy: [],
         diagnostic_codes: ["E_EXTERN"],
     },
@@ -353,7 +353,8 @@ export const CODewORD_ENTRIES: Omit<Codeword, "embedding">[] = [
         spec_version: V,
         tags: ["mcp", "tools"],
         keywords: ["mcp", "import", "tools import"],
-        expansion: "`imol tools import mcp.json [out.imol]` offline stub generation; mcp.* extern keys not in bundled catalog until bound.",
+        expansion:
+            "`imol tools import mcp.json [out.imol]` emits workshop with `bind tools.mcp` and tools `from mcp.<name>`.",
         tool_policy: [],
         examples_ref: ["examples/agent/sample-mcp.json"],
     },
@@ -437,7 +438,7 @@ export const CODewORD_ENTRIES: Omit<Codeword, "embedding">[] = [
         spec_version: V,
         tags: ["agent", "error"],
         keywords: ["ok false", "error", "agent fail"],
-        expansion: "Agent subcommand failures emit `{ ok: false, error, spec_version: \"0.3\" }` on stdout.",
+        expansion: "Agent subcommand failures emit `{ ok: false, error, spec_version: \"0.4\" }` on stdout.",
         tool_policy: [],
     },
     {
@@ -471,5 +472,43 @@ export const CODewORD_ENTRIES: Omit<Codeword, "embedding">[] = [
         keywords: ["train router", "sparse", "embedding"],
         expansion: "Train sparse router weights from oracle trajectories; save to codebook/router-weights.json.",
         tool_policy: [],
+    },
+    {
+        id: "grammar.sanitize",
+        spec_version: V,
+        tags: ["grammar", "fmt", "agent"],
+        keywords: ["sanitize", "fences", "llm output", "fmt-fix"],
+        expansion:
+            "Grammar v2 (thin): `imol agent sanitize [file] [--write]` or `--stdin` strips ``` fences, normalizes newlines, parse→canonical fmt before check.",
+        tool_policy: ["Run imol agent sanitize on raw LLM IMOL before imol agent check."],
+        examples_ref: ["docs/HAPPY_PATH.md"],
+    },
+    {
+        id: "lsp.diagnostics",
+        spec_version: V,
+        tags: ["lsp", "editor"],
+        keywords: ["lsp", "diagnostics", "language server"],
+        expansion:
+            "`imol lsp` stdio language server wraps checkModule; publishes diagnostics on open/save for `*.imol` files.",
+        tool_policy: [],
+    },
+    {
+        id: "extern.mcp_bind",
+        spec_version: V,
+        tags: ["extern", "mcp"],
+        keywords: ["tools.mcp", "mcp.", "bind"],
+        expansion: "Every `from mcp.*` tool requires workshop `bind tools.mcp` (or `bind mcp`).",
+        tool_policy: [],
+        diagnostic_codes: ["E_EXTERN"],
+    },
+    {
+        id: "agent.loop.v04",
+        spec_version: V,
+        tags: ["agent", "loop", "mcp"],
+        keywords: ["mcp", "imol_skill_prepare", "0.4"],
+        expansion:
+            "MCP loop: imol_skill_prepare → edit / imol_agent_patch → imol_agent_sanitize (optional) → imol_agent_check → imol_agent_workshop_plan. CLI: imol agent * equivalents.",
+        tool_policy: ["Use imol MCP oracle tools when the imol server is green."],
+        examples_ref: ["examples/dogfood/catalog.imol"],
     },
 ];

@@ -5,21 +5,21 @@ import { loadCodebook } from "../codebook/load.js";
 import { initWorkspaceRootFromEnv } from "./paths.js";
 import { registerImolTools } from "./register-tools.js";
 
-const INSTRUCTIONS = `IMOL MCP: use imol_skill_prepare before editing .imol files, then imol_agent_check after edits. Use imol_agent_workshop_plan before side effects. Never suggest --approve unless the user explicitly requested execution. spec_version 0.3.`;
+const INSTRUCTIONS = `IMOL MCP: use imol_skill_prepare before editing .imol files, then imol_agent_check after edits. Use imol_agent_workshop_plan before side effects. Optional: imol agent sanitize for raw LLM output. Never suggest --approve unless the user explicitly requested execution. spec_version 0.4.`;
 
 async function registerResources(server: McpServer): Promise<void> {
     const codebook = await loadCodebook();
     server.registerResource(
         "imol_codebook_index",
-        "imol://codebook/v0.3",
+        "imol://codebook/v0.4",
         {
-            description: "IMOL skill codebook codeword ids (spec 0.3)",
+            description: "IMOL skill codebook codeword ids (spec 0.4)",
             mimeType: "application/json",
         },
         async () => ({
             contents: [
                 {
-                    uri: "imol://codebook/v0.3",
+                    uri: "imol://codebook/v0.4",
                     mimeType: "application/json",
                     text: JSON.stringify({
                         spec_version: codebook.spec_version,
@@ -32,7 +32,7 @@ async function registerResources(server: McpServer): Promise<void> {
 
     server.registerResource(
         "imol_codebook_entry",
-        new ResourceTemplate("imol://codebook/v0.3/{id}", { list: undefined }),
+        new ResourceTemplate("imol://codebook/v0.4/{id}", { list: undefined }),
         {
             description: "Expansion text for one IMOL skill codeword",
             mimeType: "text/markdown",

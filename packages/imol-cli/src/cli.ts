@@ -14,6 +14,8 @@ import {
     agentCheck,
     agentFmtCheck,
     agentPatch,
+    agentSanitize,
+    agentSanitizeFile,
     agentWorkshopPlan,
     printAgentError,
     printAgentJson,
@@ -205,11 +207,30 @@ async function cmdAgent(sub: string | undefined, pos: string[], flags: Set<strin
                 printAgentJson(body);
                 return 0;
             }
+            case "sanitize": {
+                if (flags.has("--stdin")) {
+                    const chunks: Buffer[] = [];
+                    for await (const chunk of process.stdin) {
+                        chunks.push(Buffer.from(chunk));
+                    }
+                    const source = Buffer.concat(chunks).toString("utf8");
+                    const body = await agentSanitize(source);
+                    printAgentJson(body);
+                    return (body as { ok: boolean }).ok ? 0 : 1;
+                }
+                if (!pos[0]) {
+                    printAgentError("Usage: imol agent sanitize <file.imol> [--write] | --stdin");
+                    return 2;
+                }
+                const body = await agentSanitizeFile(pos[0], flags.has("--write"));
+                printAgentJson(body);
+                return (body as { ok: boolean }).ok ? 0 : 1;
+            }
             default:
                 printAgentError(
                     sub
                         ? `Unknown agent subcommand '${sub}'`
-                        : "Usage: imol agent check|fmt-check|patch|workshop-plan ...",
+                        : "Usage: imol agent check|fmt-check|patch|sanitize|workshop-plan ...",
                 );
                 return 2;
         }

@@ -18,4 +18,6 @@ CLI fallback: `npm run imol -- agent check`, `agent patch`, `agent workshop-plan
 
 Dogfood reference: `docs/HAPPY_PATH.md`, `examples/dogfood/catalog.imol`.
 
-Machine JSON: `packages/imol-spec/agent-api.json`, spec_version 0.3 in `packages/imol-spec/SPEC.md`.
+After raw LLM IMOL paste: `imol agent sanitize` (or rely on `.cursor/hooks/imol-after-imol-edit.mjs` on Write).
+
+Machine JSON: `packages/imol-spec/agent-api.json`, spec_version 0.4 in `packages/imol-spec/SPEC.md`.

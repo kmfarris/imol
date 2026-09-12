@@ -1,16 +1,17 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "IMOL agent CLI responses",
-  "description": "stdout JSON from imol agent subcommands (spec_version 0.3)",
+  "description": "stdout JSON from imol agent subcommands (spec_version 0.4)",
   "oneOf": [
     { "$ref": "#/$defs/agent_check" },
     { "$ref": "#/$defs/agent_fmt_check" },
+    { "$ref": "#/$defs/agent_sanitize" },
     { "$ref": "#/$defs/agent_patch" },
     { "$ref": "#/$defs/agent_workshop_plan" },
     { "$ref": "#/$defs/agent_error" }
   ],
   "$defs": {
-    "spec_version": { "const": "0.3" },
+    "spec_version": { "const": "0.4" },
     "diagnostic": {
       "type": "object",
       "required": ["code", "message"],
@@ -40,6 +41,26 @@
         "ok": { "type": "boolean" },
         "changed": { "type": "boolean" },
         "diff_hint": { "type": "string" },
+        "spec_version": { "$ref": "#/$defs/spec_version" }
+      }
+    },
+    "agent_sanitize": {
+      "type": "object",
+      "required": ["ok", "output", "steps", "spec_version"],
+      "properties": {
+        "ok": { "type": "boolean" },
+        "output": { "type": "string" },
+        "steps": { "type": "array", "items": { "type": "string" } },
+        "parse_error": { "type": "string" },
+        "wrote": { "type": "boolean" },
+        "check": {
+          "type": "object",
+          "required": ["ok", "diagnostics"],
+          "properties": {
+            "ok": { "type": "boolean" },
+            "diagnostics": { "type": "array", "items": { "$ref": "#/$defs/diagnostic" } }
+          }
+        },
         "spec_version": { "$ref": "#/$defs/spec_version" }
       }
     },

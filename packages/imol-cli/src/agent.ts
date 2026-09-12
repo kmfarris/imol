@@ -6,6 +6,8 @@ export {
     agentFail,
     agentFmtCheck,
     agentPatch,
+    agentSanitize,
+    agentSanitizeFile,
     agentWorkshopPlan,
     defaultLoadModule,
     type AgentError,

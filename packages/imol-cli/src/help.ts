@@ -33,7 +33,10 @@ export const CMD_HELP: Record<string, string> = {
   imol agent patch <file.imol> <patches.json>
   imol agent workshop-plan [file.imol]
 
-Stdout is JSON only. Errors: { ok: false, error, spec_version: "0.3" }`,
+  imol agent sanitize <file.imol> [--write]
+  imol agent sanitize --stdin
+
+Stdout is JSON only. Errors: { ok: false, error, spec_version: "0.4" }`,
     skill: `imol skill route "<task>" [--file path.imol] [--k 5] [--oracle last.json]
   imol skill mcp          Stdio MCP server (skill route + agent tool defs)`,
 };

@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": ".cursor/hooks/imol-session-start.mjs"
+      }
+    ],
+    "afterFileEdit": [
+      {
+        "command": ".cursor/hooks/imol-after-imol-edit.mjs",
+        "matcher": "Write"
+      }
+    ]
+  }
+}

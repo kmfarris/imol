@@ -59,7 +59,7 @@ async function main(): Promise<void> {
     const llm = await runLlmBench(3);
 
     const report = {
-        spec_version: "0.3",
+        spec_version: "0.4",
         codeword_recall_at_5: recallTotal ? recallHits / recallTotal : 0,
         scenarios: scenarioResults,
         baselines: {
