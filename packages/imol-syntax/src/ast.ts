@@ -87,6 +87,7 @@ export type WorkshopDecl = {
     kind: "workshop";
     allowNet: boolean;
     allowWrite: boolean;
+    allowShell: boolean;
     binds: string[];
     span: Span;
 };

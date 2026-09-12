@@ -2,11 +2,10 @@
 
 Preview and planned work beyond spec 0.4.
 
-## Shell (`std.shell`) — preview (this branch)
+## Shell (`std.shell`) — implemented (spec 0.5)
 
-- **Check:** `std.shell.exec` is in the extern catalog; tools need `bind std.shell` and `@unsafe`.
-- **Run:** handler returns `Err` with a fixed message until a gated implementation lands (no silent no-ops).
-- Example: `examples/shell_preview.imol`.
+- **Check:** `std.shell.exec`, `bind std.shell`, `allow_shell true`.
+- **Run:** allowlisted `execFile` + `--approve`. See `examples/shell_preview.imol`.
 
 ## Async (planned)
 

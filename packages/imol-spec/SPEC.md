@@ -1,4 +1,4 @@
-# IMOL spec_version 0.4
+# IMOL spec_version 0.5
 
 IMOL is a language for LLM-authored programs and tool orchestration. Canonical formatted source is the IR.
 
@@ -22,6 +22,7 @@ Module-level `@id` must not appear immediately before a `plan` block (parser tre
 workshop
   allow_net true|false
   allow_write true|false
+  allow_shell true|false
   bind <module.path>
 end
 ```
@@ -47,7 +48,7 @@ tool <name> from <extern.key> [@io|@net|@pure]...
 
 Bundled extern keys include `std.fs.read`, `std.fs.list`, `std.fs.write` (write requires `allow_write true`).
 
-**Preview:** `std.shell.exec` is recognised at check time with `bind std.shell`; runtime returns a structured `Err` until shell execution is enabled (see [docs/ROADMAP_RUNTIME.md](../../docs/ROADMAP_RUNTIME.md)).
+**Shell:** `std.shell.exec` with `bind std.shell` and `allow_shell true`. Runtime uses an allowlisted binary set (default `echo`, `pwd`, `node`; override with env `IMOL_SHELL_ALLOWLIST`). Requires `imol run --approve` (same gate as `run plan`). No shell interpolation (`execFile`, not `/bin/sh -c`).
 
 Dynamic **MCP** tools use `from mcp.<toolName>` and require `bind tools.mcp` (or `bind mcp`) in the workshop block. Generate stubs with `imol tools import`.
 

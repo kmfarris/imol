@@ -287,6 +287,14 @@ async function evalExpr(
             if (!tool) throw new ImolRuntimeError(`Unknown tool ${expr.tool}`);
             const effect = effectFromAttrs(tool.attrs);
             assertEffect(options, effect);
+            if (tool.from === "std.shell.exec") {
+                if (!options.planApproved) {
+                    throw new ImolRuntimeError("shell exec blocked: not approved (use --approve)");
+                }
+                if (!options.capabilities?.shell) {
+                    throw new ImolRuntimeError("shell exec blocked: workshop allow_shell false");
+                }
+            }
             const fields = new Map<string, Value>();
             for (const f of expr.fields) {
                 fields.set(f.name, await evalExpr(f.value, env, mod, fns, tools, externs, options));

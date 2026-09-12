@@ -137,13 +137,14 @@ function typesEqual(a: Type, b: Type): boolean {
 }
 
 function effectFromAttrs(attrs: Attribute[]): Effect {
+    let effect: Effect = "pure";
     for (const a of attrs) {
-        if (a.name === "@pure") return "pure";
-        if (a.name === "@io") return "io";
-        if (a.name === "@net") return "net";
-        if (a.name === "@unsafe") return "unsafe";
+        if (a.name === "@pure") effect = "pure";
+        else if (a.name === "@io") effect = maxEffect(effect, "io");
+        else if (a.name === "@net") effect = maxEffect(effect, "net");
+        else if (a.name === "@unsafe") effect = maxEffect(effect, "unsafe");
     }
-    return "pure";
+    return effect;
 }
 
 function maxEffect(a: Effect, b: Effect): Effect {
@@ -204,6 +205,13 @@ export function checkModule(mod: ModuleDecl, options: CheckOptions = {}): CheckR
                 message: `Unknown extern key '${tool.from}' on tool ${tool.name}`,
                 span: tool.span,
                 hint: "Use std.fs.*, tools.filesystem.*, or mcp.* with bind tools.mcp.",
+            });
+        } else if (tool.from === "std.shell.exec" && mod.workshop && !mod.workshop.allowShell) {
+            diags.push({
+                code: "E_WORKSHOP",
+                message: `Tool ${tool.name} uses std.shell.exec but workshop allow_shell is false`,
+                span: tool.span,
+                hint: "Set allow_shell true in workshop for shell tools.",
             });
         } else if (
             mod.workshop &&

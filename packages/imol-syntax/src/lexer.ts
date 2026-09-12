@@ -21,6 +21,7 @@ export type TokenKind =
     | "bind"
     | "allow_net"
     | "allow_write"
+    | "allow_shell"
     | "plan"
     | "run"
     | "true"
@@ -71,6 +72,7 @@ const KEYWORDS: Record<string, TokenKind> = {
     bind: "bind",
     allow_net: "allow_net",
     allow_write: "allow_write",
+    allow_shell: "allow_shell",
     plan: "plan",
     run: "run",
     true: "true",

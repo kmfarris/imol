@@ -139,6 +139,7 @@ class Parser {
         const t = this.expect("workshop", "Expected 'workshop'");
         let allowNet = false;
         let allowWrite = false;
+        let allowShell = false;
         const binds: string[] = [];
         while (!this.at("end")) {
             if (this.at("allow_net")) {
@@ -163,15 +164,29 @@ class Parser {
                 } else {
                     throw new ImolSyntaxError("Expected true or false after allow_write", this.peek().span);
                 }
+            } else if (this.at("allow_shell")) {
+                this.advance();
+                if (this.at("true")) {
+                    this.advance();
+                    allowShell = true;
+                } else if (this.at("false")) {
+                    this.advance();
+                    allowShell = false;
+                } else {
+                    throw new ImolSyntaxError("Expected true or false after allow_shell", this.peek().span);
+                }
             } else if (this.at("bind")) {
                 this.advance();
                 binds.push(this.parseDottedPath());
             } else {
-                throw new ImolSyntaxError("Expected allow_net, allow_write, bind, or end in workshop", this.peek().span);
+                throw new ImolSyntaxError(
+                    "Expected allow_net, allow_write, allow_shell, bind, or end in workshop",
+                    this.peek().span,
+                );
             }
         }
         this.expect("end", "Expected 'end' to close workshop");
-        return { kind: "workshop", allowNet, allowWrite, binds, span: t.span };
+        return { kind: "workshop", allowNet, allowWrite, allowShell, binds, span: t.span };
     }
 
     private parseDottedPath(): string {

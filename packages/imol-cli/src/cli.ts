@@ -3,7 +3,7 @@ import { checkModule, diagnosticsToJson } from "@imol/check";
 import { loadManifest, loadModuleFromFile } from "@imol/load";
 import { applyPatches, parsePatchFile } from "@imol/patch";
 import { formatModule } from "@imol/fmt";
-import { capabilitiesFromWorkshop, createExternRegistry, runModule } from "@imol/run";
+import { createExternRegistry, runCapabilities, runModule } from "@imol/run";
 import { ImolSyntaxError, parse, repairAgentGrammar } from "@imol/syntax";
 import { compareTraces, WorkshopSession } from "@imol/workshop";
 import { readFile, writeFile } from "node:fs/promises";
@@ -112,7 +112,7 @@ async function cmdRun(path: string | undefined, approve: boolean): Promise<numbe
         printDiagnostics(check.diagnostics);
         return 1;
     }
-    const caps = capabilitiesFromWorkshop(mod.workshop);
+    const caps = runCapabilities(mod.workshop, approve);
     const externs = createExternRegistry(caps, mod.workshop?.binds ?? []);
     await runModule(mod, externs, {
         capabilities: caps,
