@@ -76,7 +76,25 @@ Packages are workspace-local today (`private: true` root). To publish:
 2. `npm publish -w @imol/cli --access public` (after removing `private` on the package).
 3. Document `imol-mcp` bin from `@imol/skill` and the stable launcher pattern in `scripts/imol-mcp.mjs`.
 
-CI runs tests, conformance, and `node scripts/mcp-smoke.mjs` after build.
+CI runs tests, conformance, `npm run skill:dataset` (trajectories must match committed `packages/imol-skill/data/oracle-trajectories.jsonl`), and `node scripts/mcp-smoke.mjs` after build.
+
+## CSD router train (optional)
+
+Regenerate oracle trajectories locally:
+
+```bash
+npm run skill:dataset
+```
+
+Commit `packages/imol-skill/data/oracle-trajectories.jsonl` when inventory or oracle paths change.
+
+Train sparse router weights (writes `packages/imol-skill/codebook/router-weights.json`):
+
+```bash
+npm run skill:train
+```
+
+On GitHub: **Actions → Skill train → Run workflow**, then download the **router-weights** artifact. CI does not push weights to the repo automatically.
 
 ## Security
 

@@ -14,4 +14,6 @@ jobs:
           node-version: "22"
       - run: npm ci
       - run: npm run check
+      - run: npm run skill:dataset
+      - run: git diff --exit-code packages/imol-skill/data/
       - run: node scripts/mcp-smoke.mjs
