@@ -25,6 +25,17 @@ npm run imol -- agent check examples/greet.imol
 
 See `.cursor/rules/imol.mdc` and `packages/imol-spec/agent-api.json`.
 
+## Skill dictionary (CSD)
+
+Closed-model hosts can inject a minimal packet instead of full SPEC:
+
+```bash
+npm run imol -- skill route "patch greet by @id" --file examples/greet.imol
+npm run skill:bench
+```
+
+MCP (production stdio): configure Cursor with [packages/imol-skill/mcp/cursor-mcp.example.json](packages/imol-skill/mcp/cursor-mcp.example.json), then use tools `imol_skill_prepare`, `imol_agent_check`, etc. See [packages/imol-skill/README.md](packages/imol-skill/README.md).
+
 ## Repository layout
 
 - `packages/imol-syntax` — lexer, parser, AST
@@ -36,6 +47,7 @@ See `.cursor/rules/imol.mdc` and `packages/imol-spec/agent-api.json`.
 - `packages/imol-patch` — `@id` patch application
 - `packages/imol-load` — manifest + multi-file import
 - `packages/imol-spec` — language spec (0.3), agent API JSON
+- `packages/imol-skill` — flat skill codebook (CSD), router, `imol skill route`, MCP host
 - `examples/` — sample programs (`bad/`, `golden/`)
 
 ## Remote

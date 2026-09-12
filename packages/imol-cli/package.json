@@ -16,6 +16,7 @@
     "@imol/syntax": "0.1.0",
     "@imol/workshop": "0.1.0",
     "@imol/patch": "0.2.0",
-    "@imol/load": "0.1.0"
+    "@imol/load": "0.1.0",
+    "@imol/skill": "0.1.0"
   }
 }

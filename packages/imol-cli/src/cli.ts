@@ -7,7 +7,9 @@ import { capabilitiesFromWorkshop, createExternRegistry, runModule } from "@imol
 import { ImolSyntaxError, parse } from "@imol/syntax";
 import { compareTraces, WorkshopSession } from "@imol/workshop";
 import { readFile, writeFile } from "node:fs/promises";
+import { spawn } from "node:child_process";
 import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import {
     agentCheck,
     agentFmtCheck,
@@ -17,6 +19,7 @@ import {
     printAgentJson,
 } from "./agent.js";
 import { CMD_HELP, TOP_HELP } from "./help.js";
+import { cmdSkillRoute } from "@imol/skill";
 import { mcpToImolTools, parseMcpExport } from "./mcp-import.js";
 
 async function readSource(path: string): Promise<string> {
@@ -233,6 +236,44 @@ async function main(): Promise<number> {
     try {
         if (cmd === "agent") {
             return cmdAgent(args[1], args.slice(2), flags);
+        }
+        if (cmd === "skill") {
+            const sub = args[1];
+            if (sub === "route") {
+                let task = "";
+                let file: string | undefined;
+                let k = 5;
+                let oracle: string | undefined;
+                const pos = args.slice(2);
+                for (let i = 0; i < pos.length; i++) {
+                    const a = pos[i];
+                    if (a === "--file" && pos[i + 1]) {
+                        file = pos[++i];
+                    } else if (a === "--k" && pos[i + 1]) {
+                        k = Number(pos[++i]) || 5;
+                    } else if (a === "--oracle" && pos[i + 1]) {
+                        oracle = pos[++i];
+                    } else if (a && !a.startsWith("--")) {
+                        task = task ? `${task} ${a}` : a;
+                    }
+                }
+                if (!task) {
+                    console.error('Usage: imol skill route "<task>" [--file path.imol] [--k 5]');
+                    return 2;
+                }
+                return cmdSkillRoute(task, file, k, oracle);
+            }
+            if (sub === "mcp") {
+                const serverPath = fileURLToPath(import.meta.resolve("@imol/skill/mcp"));
+                const code = await new Promise<number>((res) => {
+                    const child = spawn(process.execPath, [serverPath], { stdio: "inherit" });
+                    child.on("exit", (c) => res(c ?? 1));
+                    child.on("error", () => res(1));
+                });
+                return code;
+            }
+            console.error("Usage: imol skill route|mcp ...");
+            return 2;
         }
         switch (cmd) {
             case "check":

@@ -1,0 +1,61 @@
+{
+  "spec_version": "0.3",
+  "scenarios": [
+    {
+      "id": "new_module",
+      "task": "Create a new IMOL hello module with main and io.println",
+      "expected_codewords": ["syntax.module_layout", "syntax.function", "syntax.std_io", "agent.check"]
+    },
+    {
+      "id": "patch_greet",
+      "task": "Patch greet-fn by id using agent patch JSON",
+      "expected_codewords": ["patch.replace_decl_by_id", "agent.patch", "patch.by_id"]
+    },
+    {
+      "id": "workshop_read",
+      "task": "Add std.fs.read tool with workshop bind std.fs",
+      "expected_codewords": ["extern.std_fs_read", "syntax.workshop", "syntax.tool_decl"]
+    },
+    {
+      "id": "plan_first",
+      "task": "Workshop plan block dry run without approve",
+      "expected_codewords": ["workshop.plan_first", "agent.workshop_plan", "agent.no_approve_default"]
+    },
+    {
+      "id": "extern_error",
+      "task": "Fix E_EXTERN bogus extern key on tool",
+      "expected_codewords": ["extern.catalog", "check.diagnostics"]
+    },
+    {
+      "id": "import_tools",
+      "task": "Import tools.fs and call read_file without name collision",
+      "expected_codewords": ["syntax.import", "import.collision", "import.merge"]
+    },
+    {
+      "id": "agent_loop",
+      "task": "Follow agent loop check patch workshop-plan spec 0.3",
+      "expected_codewords": ["agent.loop.v03", "agent.check", "agent.spec_version"]
+    },
+    {
+      "id": "fmt_ir",
+      "task": "Ensure canonical fmt IR before commit",
+      "expected_codewords": ["fmt.canonical", "agent.fmt_check"]
+    },
+    {
+      "id": "run_plan_approve",
+      "task": "User explicitly asked to run plan with approve",
+      "expected_codewords": ["workshop.approve_gate", "runner.run_plan"]
+    },
+    {
+      "id": "mcp_import",
+      "task": "Generate IMOL tools from sample mcp json export",
+      "expected_codewords": ["mcp.tools_import"]
+    }
+  ],
+  "baselines": {
+    "A_none": { "description": "No doc; oracle loop only", "packet_tokens": 0 },
+    "B_cheat_sheet": { "description": "One-page cheat sheet", "file": "bench/cheat-sheet.md" },
+    "C_full_spec": { "description": "Full SPEC.md in context", "file": "packages/imol-spec/SPEC.md" },
+    "D_csd": { "description": "CSD packet k=5 from router", "k": 5 }
+  }
+}

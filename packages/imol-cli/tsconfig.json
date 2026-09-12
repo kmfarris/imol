@@ -2,7 +2,12 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": "src"
+    "rootDir": "src",
+    "paths": {
+      "@imol/skill": ["../imol-skill/dist/index.d.ts"],
+      "@imol/skill/oracle": ["../imol-skill/dist/oracle/agent.d.ts"],
+      "@imol/skill/*": ["../imol-skill/dist/*"]
+    }
   },
   "include": ["src/**/*"]
 }

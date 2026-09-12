@@ -1,0 +1,55 @@
+{
+  "name": "@imol/skill",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./mcp": {
+      "types": "./dist/mcp/server.d.ts",
+      "import": "./dist/mcp/server.js",
+      "require": "./dist/mcp/server.js",
+      "default": "./dist/mcp/server.js"
+    },
+    "./mcp/tools": {
+      "types": "./dist/mcp/tools.d.ts",
+      "import": "./dist/mcp/tools.js"
+    },
+    "./mcp/paths": {
+      "types": "./dist/mcp/paths.d.ts",
+      "import": "./dist/mcp/paths.js"
+    },
+    "./cli-skill": {
+      "types": "./dist/cli-skill.d.ts",
+      "import": "./dist/cli-skill.js"
+    },
+    "./oracle": {
+      "types": "./dist/oracle/agent.d.ts",
+      "import": "./dist/oracle/agent.js"
+    }
+  },
+  "bin": {
+    "imol-mcp": "./dist/mcp/server.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "codebook:build": "node scripts/build-codebook.mjs",
+    "dataset:synth": "node dist/dataset/synthesize.js",
+    "router:train": "node dist/router/train.js",
+    "bench": "node dist/bench/run.js"
+  },
+  "dependencies": {
+    "@imol/check": "0.1.0",
+    "@imol/fmt": "0.1.0",
+    "@imol/load": "0.1.0",
+    "@imol/patch": "0.2.0",
+    "@imol/syntax": "0.1.0",
+    "@imol/workshop": "0.1.0",
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "zod": "^3.25.0"
+  }
+}

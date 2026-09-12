@@ -1,0 +1,10 @@
+export type { Codebook, Codeword, RouteInput, RouteResult, TrajectoryStep } from "./types.js";
+export { EMBEDDING_DIM, embedText, tokenize } from "./embed.js";
+export { buildCodebookFromInventory } from "./inventory/build.js";
+export { CODewORD_ENTRIES } from "./inventory/entries.js";
+export { loadCodebook, loadCodebookSync } from "./codebook/load.js";
+export { compilePacket, estimateTokens } from "./compiler/packet.js";
+export { routeSkills, codewordsForDiagnostics } from "./router/route.js";
+export { loadRouterWeights, saveRouterWeights, weightsPath } from "./router/weights.js";
+export type { RouterWeights } from "./router/weights.js";
+export { cmdSkillRoute } from "./cli-skill.js";

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "imol": {
+      "command": "node",
+      "args": ["${workspaceFolder}/scripts/imol-mcp.mjs"],
+      "env": {
+        "IMOL_WORKSPACE_ROOT": "${workspaceFolder}"
+      }
+    }
+  }
+}

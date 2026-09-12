@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "IMOL Skill Codebook",
+  "type": "object",
+  "required": ["spec_version", "codebook_id", "codewords"],
+  "properties": {
+    "spec_version": { "type": "string", "pattern": "^0\\.[0-9]+$" },
+    "codebook_id": { "type": "string" },
+    "embedding_dim": { "type": "integer", "minimum": 1 },
+    "codewords": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/codeword" }
+    }
+  },
+  "$defs": {
+    "codeword": {
+      "type": "object",
+      "required": ["id", "spec_version", "tags", "keywords", "expansion", "tool_policy"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9._-]+$" },
+        "spec_version": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "keywords": { "type": "array", "items": { "type": "string" } },
+        "embedding": { "type": "array", "items": { "type": "number" } },
+        "expansion": { "type": "string" },
+        "tool_policy": { "type": "array", "items": { "type": "string" } },
+        "examples_ref": { "type": "array", "items": { "type": "string" } },
+        "diagnostic_codes": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

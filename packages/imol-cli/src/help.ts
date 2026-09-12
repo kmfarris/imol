@@ -11,6 +11,7 @@ Commands:
   workshop [file]        Workshop session (trace, dry-run, approve)
   tools import <json>    Generate tool stubs from MCP export
   agent <subcmd>         Machine JSON API for agents (see spec agent-api.json)
+  skill <subcmd>         IMOL skill dictionary route / MCP host
 
 Global:
   imol --help            This message
@@ -32,4 +33,6 @@ export const CMD_HELP: Record<string, string> = {
   imol agent workshop-plan [file.imol]
 
 Stdout is JSON only. Errors: { ok: false, error, spec_version: "0.3" }`,
+    skill: `imol skill route "<task>" [--file path.imol] [--k 5] [--oracle last.json]
+  imol skill mcp          Stdio MCP server (skill route + agent tool defs)`,
 };
