@@ -121,6 +121,8 @@ export async function agentPatch(imolPath: string, patchPath: string): Promise<o
     };
 }
 
+export { agentLoop, type AgentLoopInput } from "./agent-loop.js";
+
 export async function agentWorkshopPlan(loadMod: LoadModuleFn, entry: string): Promise<object> {
     const abs = resolve(entry);
     const mod = await loadMod(abs);

@@ -33,6 +33,7 @@ export const CMD_HELP: Record<string, string> = {
   imol agent fmt-check <file.imol>
   imol agent patch <file.imol> <patches.json>
   imol agent workshop-plan [file.imol]
+  imol agent loop --task "..." [--dry-llm] [--patch patches.json] [--max-iter N] [file.imol]
 
   imol agent sanitize <file.imol> [--write]
   imol agent sanitize --stdin

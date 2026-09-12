@@ -1,0 +1,33 @@
+name: Agent loop
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  dry-llm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm ci
+      - run: npm run build
+      - run: npm run imol -- agent loop --dry-llm --task "dogfood oracle loop" examples/dogfood/catalog.imol
+
+  llm-optional:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm ci
+      - run: npm run build
+      - run: npm run imol -- agent loop --task "keep greet.imol valid" examples/greet.imol --max-iter 1
+        env:
+          IMOL_AGENTBENCH_API_KEY: ${{ secrets.IMOL_AGENTBENCH_API_KEY }}
+        continue-on-error: true

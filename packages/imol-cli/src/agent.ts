@@ -9,6 +9,7 @@ export {
     agentSanitize,
     agentSanitizeFile,
     agentWorkshopPlan,
+    agentLoop,
     defaultLoadModule,
     type AgentError,
     type LoadModuleFn,

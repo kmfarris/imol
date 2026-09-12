@@ -512,6 +512,16 @@ export const CODewORD_ENTRIES: Omit<Codeword, "embedding">[] = [
         diagnostic_codes: ["E_EXTERN"],
     },
     {
+        id: "agent.automation",
+        spec_version: V,
+        tags: ["agent", "automation", "ci"],
+        keywords: ["agent loop", "dry-llm", "orchestrator", "automation"],
+        expansion:
+            "`imol agent loop` / MCP `imol_agent_loop` runs prepare → patch|LLM → sanitize → check → workshop-plan. See docs/AGENT_AUTOMATION.md.",
+        tool_policy: ["Use imol agent loop or imol_agent_loop for scripted oracle compliance."],
+        examples_ref: ["docs/AGENT_AUTOMATION.md"],
+    },
+    {
         id: "agent.loop.v04",
         spec_version: V,
         tags: ["agent", "loop", "mcp"],

@@ -17,6 +17,7 @@ import {
     agentSanitize,
     agentSanitizeFile,
     agentWorkshopPlan,
+    agentLoop,
     printAgentError,
     printAgentJson,
 } from "./agent.js";
@@ -226,6 +227,40 @@ async function cmdAgent(sub: string | undefined, pos: string[], flags: Set<strin
                 const body = await agentWorkshopPlan(loadMod, entry);
                 printAgentJson(body);
                 return 0;
+            }
+            case "loop": {
+                let task = "";
+                let fileArg: string | undefined;
+                let maxIter = 3;
+                let patchPath: string | undefined;
+                const dryLlm = flags.has("--dry-llm");
+                for (let i = 0; i < pos.length; i++) {
+                    const a = pos[i];
+                    if (a === "--task" && pos[i + 1]) {
+                        task = pos[++i]!;
+                    } else if (a === "--max-iter" && pos[i + 1]) {
+                        maxIter = Number(pos[++i]) || 3;
+                    } else if (a === "--patch" && pos[i + 1]) {
+                        patchPath = pos[++i];
+                    } else if (a && !a.startsWith("--")) {
+                        fileArg = a;
+                    } else if (a && !task && !a.startsWith("--")) {
+                        task = a;
+                    }
+                }
+                if (!task) {
+                    task = "IMOL agent oracle loop";
+                }
+                const entry = await resolveEntryPath(fileArg);
+                const body = await agentLoop(loadMod, {
+                    task,
+                    file: entry,
+                    max_iter: maxIter,
+                    ...(patchPath ? { patch_path: patchPath } : {}),
+                    dry_llm: dryLlm,
+                });
+                printAgentJson(body);
+                return (body as { ok: boolean }).ok ? 0 : 1;
             }
             case "sanitize": {
                 if (flags.has("--stdin")) {

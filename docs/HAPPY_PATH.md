@@ -27,7 +27,7 @@ npm run imol -- run examples/dogfood/catalog.imol --approve
 5. **`imol_agent_workshop_plan`** — inspect trace before any real I/O.
 6. Run **`imol run … --approve`** in the terminal only when you intend side effects (not exposed on MCP).
 
-See [packages/imol-skill/README.md](../packages/imol-skill/README.md) and [`.cursor/rules/imol.mdc`](../.cursor/rules/imol.mdc).
+See [packages/imol-skill/README.md](../packages/imol-skill/README.md), [docs/AGENT_AUTOMATION.md](AGENT_AUTOMATION.md), and [`.cursor/rules/imol.mdc`](../.cursor/rules/imol.mdc).
 
 ## Patch target
 
