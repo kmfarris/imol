@@ -106,6 +106,8 @@ function formatStmt(s: Stmt, indent: string): string {
         }
         case "run_plan":
             return `${indent}run plan`;
+        case "await_invoke":
+            return `${indent}await invoke ${s.tool} { ${s.fields.map((f) => `${f.name}: ${formatExpr(f.value, indent)}`).join(", ")} }`;
     }
 }
 

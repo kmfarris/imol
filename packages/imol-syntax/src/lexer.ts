@@ -14,6 +14,7 @@ export type TokenKind =
     | "if"
     | "match"
     | "invoke"
+    | "await"
     | "end"
     | "else"
     | "hole"
@@ -65,6 +66,7 @@ const KEYWORDS: Record<string, TokenKind> = {
     if: "if",
     match: "match",
     invoke: "invoke",
+    await: "await",
     end: "end",
     else: "else",
     hole: "hole",

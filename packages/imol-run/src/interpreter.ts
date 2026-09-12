@@ -12,7 +12,7 @@ export type RunOptions = {
 
 export type TraceEntry = {
     ts: number;
-    kind: "invoke" | "extern" | "io";
+    kind: "invoke" | "extern" | "io" | "async_scheduled" | "async_done";
     name: string;
     tool?: string;
     extern?: string;
@@ -186,6 +186,28 @@ async function evalStmt(
                 type: "normal",
                 value: await evalExpr(stmt.value, env, mod, fns, tools, externs, options),
             };
+        case "await_invoke": {
+            const toolDecl = tools.get(stmt.tool);
+            const effect = toolDecl ? effectFromAttrs(toolDecl.attrs) : "pure";
+            const asyncMeta: Omit<TraceEntry, "ts" | "dry_run"> = {
+                kind: "async_scheduled",
+                name: stmt.tool,
+                tool: stmt.tool,
+                args_digest: digestRecord(stmt.fields),
+                effect,
+            };
+            if (toolDecl) asyncMeta.extern = toolDecl.from;
+            emitTrace(options, asyncMeta);
+            const inv: Expr = {
+                kind: "invoke",
+                tool: stmt.tool,
+                fields: stmt.fields,
+                span: stmt.span,
+            };
+            const value = await evalExpr(inv, env, mod, fns, tools, externs, options);
+            emitTrace(options, { ...asyncMeta, kind: "async_done" });
+            return { type: "normal", value };
+        }
     }
 }
 

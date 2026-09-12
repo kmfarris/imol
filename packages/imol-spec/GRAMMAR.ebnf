@@ -8,6 +8,7 @@ module_body   = { import_decl | plan_decl | tool_decl | type_decl | function_dec
 workshop_decl = "workshop" workshop_line { workshop_line } "end" ;
 workshop_line = ( "allow_net" boolean
                 | "allow_write" boolean
+                | "allow_shell" boolean
                 | "bind" dotted_path ) ;
 
 import_decl   = "import" dotted_path "as" ident ;
@@ -34,6 +35,7 @@ stmt          = "let" ident type_expr "=" expr
               | "if" expr stmt_block [ "else" stmt_block ]
               | "match" expr match_arm { match_arm } "end"
               | "run" "plan"
+              | "await" invoke_expr
               | expr ;
 
 match_arm     = ident [ ident ] "->" expr ;

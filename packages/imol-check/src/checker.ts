@@ -298,6 +298,18 @@ export function checkModule(mod: ModuleDecl, options: CheckOptions = {}): CheckR
                 });
                 break;
             }
+            case "await_invoke": {
+                const inv: import("@imol/syntax").Expr = {
+                    kind: "invoke",
+                    tool: stmt.tool,
+                    fields: stmt.fields,
+                    span: stmt.span,
+                };
+                const t = checkExpr(inv, env, ret);
+                effect = t.effect;
+                hasHolesLocal = t.hasHoles;
+                break;
+            }
             case "if_block": {
                 const c = checkExpr(stmt.cond, env);
                 if (!typesEqual(c.type, { kind: "bool" })) {

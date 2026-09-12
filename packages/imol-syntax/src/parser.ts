@@ -386,6 +386,12 @@ class Parser {
                 const t = this.advance();
                 this.expect("plan", "Expected 'plan' after run");
                 stmts.push({ kind: "run_plan", span: t.span });
+            } else if (this.at("await")) {
+                const t = this.advance();
+                this.expect("invoke", "Expected 'invoke' after await");
+                const tool = this.expect("ident", "Expected tool name after invoke").lexeme;
+                const fields = this.parseRecordFields();
+                stmts.push({ kind: "await_invoke", tool, fields, span: t.span });
             } else if (this.at("if")) {
                 const t = this.advance();
                 const cond = this.parseExpr();

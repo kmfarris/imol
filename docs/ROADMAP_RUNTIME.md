@@ -7,16 +7,17 @@ Preview and planned work beyond spec 0.4.
 - **Check:** `std.shell.exec`, `bind std.shell`, `allow_shell true`.
 - **Run:** allowlisted `execFile` + `--approve`. See `examples/shell_preview.imol`.
 
-## Async (planned)
+## Async — preview (spec 0.5)
 
-- Syntax: `async function` / `await invoke` not in the parser yet.
-- Target: workshop-scheduled invokes with trace entries for pending/async completion.
-- Dogfood trigger: dogfood catalog or a service module that needs concurrent I/O.
+- **Syntax:** statement `await invoke <tool> { ... }` only (no `async function` yet).
+- **Runtime:** sequential execution (same as `invoke`); workshop trace adds `async_scheduled` / `async_done` metadata around the invoke.
+- **Example:** `examples/async_preview.imol`.
 
-## Live MCP server (planned)
+## Live MCP server (manifest preview)
 
 - IMOL will not autostart external MCP servers (non-goal).
-- Planned: optional **host bridge** tool that forwards `invoke` to an already-running MCP session configured in the workshop manifest.
+- **`imol.json`:** optional `mcp_servers: [{ name, command }]` documents host-side MCP processes for editors/agents.
+- **Forward path:** future `extern mcp_host.*` bridge to an already-running session (see SPEC appendix).
 
 ## Bytecode (planned)
 

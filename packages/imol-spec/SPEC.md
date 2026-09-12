@@ -66,6 +66,27 @@ Operations: `replace_decl_by_id`, `insert_after_id`, `delete_decl_by_id`.
 
 `imol.json` or minimal `imol.toml` with `entry = "path.imol"`. `imol check` with no path uses the manifest entry.
 
+Optional fields in `imol.json` (host configuration; ignored at check time today):
+
+```json
+{
+  "entry": "examples/dogfood/catalog.imol",
+  "mcp_servers": [{ "name": "imol", "command": "node scripts/imol-mcp.mjs" }]
+}
+```
+
+IMOL does not start these processes; editors and agents use the list to wire MCP. A future **MCP host bridge** may map `extern mcp_host.*` to an already-running server.
+
+## Async invoke (preview)
+
+Statement form only:
+
+```
+await invoke read_file { path: "..." }
+```
+
+Execution is sequential (same as `invoke`). Workshop traces may include `async_scheduled` and `async_done` entries bracketing the invoke. `async function` and real concurrency are not in this spec slice.
+
 ## MCP tool import
 
 `imol tools import mcp.json [out.imol]` generates IMOL tool stubs from an exported MCP tool list (offline JSON), including a workshop block with `bind tools.mcp`.
