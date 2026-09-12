@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { checkModule } from "@imol/check";
 import { parse } from "@imol/syntax";
-import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { codewordsForDiagnostics } from "../router/route.js";
@@ -33,30 +33,69 @@ const QUERY_TEMPLATES: { query: string; codewords: string[]; mutate?: (src: stri
         mutate: (src) => src.replace("std.fs.read", "bogus.key"),
     },
     {
+        query: "Fix E_EXTERN on mcp tool missing bind tools.mcp",
+        codewords: ["extern.mcp_bind", "extern.catalog", "mcp.tools_import"],
+        mutate: (src) =>
+            src.includes("from mcp.")
+                ? src.replace(/bind tools\.mcp\n/, "")
+                : `module x\n\ntool t from mcp.search @io\n  { query: Text } -> Result\n\ntype Result = Ok Text | Err Text\n`,
+    },
+    {
         query: "Import tools.fs and invoke read_file",
         codewords: ["syntax.import", "import.merge", "import.collision"],
     },
     {
         query: "Use imol agent check json before edit",
-        codewords: ["agent.loop.v03", "agent.check", "agent.spec_version"],
+        codewords: ["agent.loop.v04", "agent.check", "agent.spec_version"],
+    },
+    {
+        query: "Sanitize LLM markdown fences before check",
+        codewords: ["grammar.sanitize", "fmt.canonical", "agent.check"],
+    },
+    {
+        query: "Dogfood catalog plan and workshop dry run",
+        codewords: ["syntax.plan", "agent.workshop_plan", "agent.loop.v04"],
     },
     {
         query: "Format check canonical IR",
         codewords: ["fmt.canonical", "agent.fmt_check"],
     },
+    {
+        query: "Configure imol lsp for editor diagnostics",
+        codewords: ["lsp.diagnostics", "check.diagnostics"],
+    },
 ];
 
 async function collectExampleSources(): Promise<string[]> {
     const paths: string[] = [];
-    for (const dir of ["examples", "examples/golden"]) {
-        const full = join(repoRoot, dir);
-        for (const name of await readdir(full).catch(() => [])) {
-            if (name.endsWith(".imol")) {
-                paths.push(join(full, name));
-            }
-        }
+    const roots = [
+        join(repoRoot, "examples"),
+        join(repoRoot, "examples/golden"),
+        join(repoRoot, "examples/bad"),
+        join(repoRoot, "examples/dogfood"),
+    ];
+    for (const root of roots) {
+        await walkImol(root, paths);
     }
     return paths;
+}
+
+async function walkImol(dir: string, out: string[]): Promise<void> {
+    let entries: string[];
+    try {
+        entries = await readdir(dir);
+    } catch {
+        return;
+    }
+    for (const name of entries) {
+        const full = join(dir, name);
+        const st = await stat(full);
+        if (st.isDirectory()) {
+            await walkImol(full, out);
+        } else if (name.endsWith(".imol")) {
+            out.push(full);
+        }
+    }
 }
 
 async function main(): Promise<void> {

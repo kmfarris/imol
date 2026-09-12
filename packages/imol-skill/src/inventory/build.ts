@@ -9,8 +9,8 @@ export function buildCodebookFromInventory(): Codebook {
         return { ...entry, embedding };
     });
     return {
-        spec_version: "0.3",
-        codebook_id: "imol-skill-v0.3",
+        spec_version: "0.4",
+        codebook_id: "imol-skill-v0.4",
         embedding_dim: EMBEDDING_DIM,
         codewords,
     };

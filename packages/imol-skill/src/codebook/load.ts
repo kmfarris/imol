@@ -6,7 +6,7 @@ import type { Codebook } from "../types.js";
 
 const pkgRoot = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
-export async function loadCodebook(version = "0.3"): Promise<Codebook> {
+export async function loadCodebook(version = "0.4"): Promise<Codebook> {
     const path = join(pkgRoot, "codebook", `v${version}.json`);
     try {
         const raw = await readFile(path, "utf8");

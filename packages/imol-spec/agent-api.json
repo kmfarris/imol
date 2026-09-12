@@ -1,16 +1,18 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "IMOL agent CLI responses",
-  "description": "stdout JSON from imol agent subcommands (spec_version 0.3)",
+  "description": "stdout JSON from imol agent subcommands (spec_version 0.4)",
   "oneOf": [
     { "$ref": "#/$defs/agent_check" },
     { "$ref": "#/$defs/agent_fmt_check" },
+    { "$ref": "#/$defs/agent_sanitize" },
     { "$ref": "#/$defs/agent_patch" },
     { "$ref": "#/$defs/agent_workshop_plan" },
+    { "$ref": "#/$defs/agent_loop" },
     { "$ref": "#/$defs/agent_error" }
   ],
   "$defs": {
-    "spec_version": { "const": "0.3" },
+    "spec_version": { "const": "0.4" },
     "diagnostic": {
       "type": "object",
       "required": ["code", "message"],
@@ -43,6 +45,26 @@
         "spec_version": { "$ref": "#/$defs/spec_version" }
       }
     },
+    "agent_sanitize": {
+      "type": "object",
+      "required": ["ok", "output", "steps", "spec_version"],
+      "properties": {
+        "ok": { "type": "boolean" },
+        "output": { "type": "string" },
+        "steps": { "type": "array", "items": { "type": "string" } },
+        "parse_error": { "type": "string" },
+        "wrote": { "type": "boolean" },
+        "check": {
+          "type": "object",
+          "required": ["ok", "diagnostics"],
+          "properties": {
+            "ok": { "type": "boolean" },
+            "diagnostics": { "type": "array", "items": { "$ref": "#/$defs/diagnostic" } }
+          }
+        },
+        "spec_version": { "$ref": "#/$defs/spec_version" }
+      }
+    },
     "agent_patch": {
       "type": "object",
       "required": ["ok", "output", "check", "spec_version"],
@@ -69,6 +91,21 @@
         "state": { "type": "string" },
         "trace_path": { "type": "string" },
         "spec_version": { "$ref": "#/$defs/spec_version" }
+      }
+    },
+    "agent_loop": {
+      "type": "object",
+      "required": ["ok", "spec_version", "entry", "iterations", "loop_compliance", "token_budget"],
+      "properties": {
+        "ok": { "type": "boolean" },
+        "spec_version": { "$ref": "#/$defs/spec_version" },
+        "entry": { "type": "string" },
+        "token_budget": { "type": "number" },
+        "prepare": { "type": "object" },
+        "iterations": { "type": "array" },
+        "final_check": { "type": "object" },
+        "workshop_plan": { "type": "object" },
+        "loop_compliance": { "type": "array" }
       }
     },
     "agent_error": {

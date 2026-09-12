@@ -3,8 +3,8 @@ import { checkModule, diagnosticsToJson } from "@imol/check";
 import { loadManifest, loadModuleFromFile } from "@imol/load";
 import { applyPatches, parsePatchFile } from "@imol/patch";
 import { formatModule } from "@imol/fmt";
-import { capabilitiesFromWorkshop, createExternRegistry, runModule } from "@imol/run";
-import { ImolSyntaxError, parse } from "@imol/syntax";
+import { createExternRegistry, runCapabilities, runModule } from "@imol/run";
+import { ImolSyntaxError, parse, repairAgentGrammar } from "@imol/syntax";
 import { compareTraces, WorkshopSession } from "@imol/workshop";
 import { readFile, writeFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
@@ -14,7 +14,10 @@ import {
     agentCheck,
     agentFmtCheck,
     agentPatch,
+    agentSanitize,
+    agentSanitizeFile,
     agentWorkshopPlan,
+    agentLoop,
     printAgentError,
     printAgentJson,
 } from "./agent.js";
@@ -47,6 +50,26 @@ async function resolveEntryPath(argPath: string | undefined): Promise<string> {
 async function loadMod(path: string) {
     const root = dirname(path);
     return loadModuleFromFile(path, { projectRoot: root });
+}
+
+const GRAMMAR_EBNF = join(
+    dirname(fileURLToPath(import.meta.url)),
+    "../../imol-spec/GRAMMAR.ebnf",
+);
+
+async function cmdGrammar(sub: string | undefined, filePath: string | undefined): Promise<number> {
+    if (sub === "show") {
+        process.stdout.write(await readFile(GRAMMAR_EBNF, "utf8"));
+        return 0;
+    }
+    if (sub === "repair" && filePath) {
+        const src = await readFile(resolve(filePath), "utf8");
+        const { source, repairs } = repairAgentGrammar(src);
+        console.log(JSON.stringify({ repairs, source }, null, 2));
+        return 0;
+    }
+    console.error("Usage: imol grammar show | imol grammar repair <file.imol>");
+    return 2;
 }
 
 async function cmdCheck(path: string | undefined, allowHoles: boolean, json: boolean): Promise<number> {
@@ -90,7 +113,7 @@ async function cmdRun(path: string | undefined, approve: boolean): Promise<numbe
         printDiagnostics(check.diagnostics);
         return 1;
     }
-    const caps = capabilitiesFromWorkshop(mod.workshop);
+    const caps = runCapabilities(mod.workshop, approve);
     const externs = createExternRegistry(caps, mod.workshop?.binds ?? []);
     await runModule(mod, externs, {
         capabilities: caps,
@@ -205,11 +228,64 @@ async function cmdAgent(sub: string | undefined, pos: string[], flags: Set<strin
                 printAgentJson(body);
                 return 0;
             }
+            case "loop": {
+                let task = "";
+                let fileArg: string | undefined;
+                let maxIter = 3;
+                let patchPath: string | undefined;
+                const dryLlm = flags.has("--dry-llm");
+                for (let i = 0; i < pos.length; i++) {
+                    const a = pos[i];
+                    if (a === "--task" && pos[i + 1]) {
+                        task = pos[++i]!;
+                    } else if (a === "--max-iter" && pos[i + 1]) {
+                        maxIter = Number(pos[++i]) || 3;
+                    } else if (a === "--patch" && pos[i + 1]) {
+                        patchPath = pos[++i];
+                    } else if (a && !a.startsWith("--")) {
+                        fileArg = a;
+                    } else if (a && !task && !a.startsWith("--")) {
+                        task = a;
+                    }
+                }
+                if (!task) {
+                    task = "IMOL agent oracle loop";
+                }
+                const entry = await resolveEntryPath(fileArg);
+                const body = await agentLoop(loadMod, {
+                    task,
+                    file: entry,
+                    max_iter: maxIter,
+                    ...(patchPath ? { patch_path: patchPath } : {}),
+                    dry_llm: dryLlm,
+                });
+                printAgentJson(body);
+                return (body as { ok: boolean }).ok ? 0 : 1;
+            }
+            case "sanitize": {
+                if (flags.has("--stdin")) {
+                    const chunks: Buffer[] = [];
+                    for await (const chunk of process.stdin) {
+                        chunks.push(Buffer.from(chunk));
+                    }
+                    const source = Buffer.concat(chunks).toString("utf8");
+                    const body = await agentSanitize(source);
+                    printAgentJson(body);
+                    return (body as { ok: boolean }).ok ? 0 : 1;
+                }
+                if (!pos[0]) {
+                    printAgentError("Usage: imol agent sanitize <file.imol> [--write] | --stdin");
+                    return 2;
+                }
+                const body = await agentSanitizeFile(pos[0], flags.has("--write"));
+                printAgentJson(body);
+                return (body as { ok: boolean }).ok ? 0 : 1;
+            }
             default:
                 printAgentError(
                     sub
                         ? `Unknown agent subcommand '${sub}'`
-                        : "Usage: imol agent check|fmt-check|patch|workshop-plan ...",
+                        : "Usage: imol agent check|fmt-check|patch|sanitize|workshop-plan ...",
                 );
                 return 2;
         }
@@ -278,6 +354,9 @@ async function main(): Promise<number> {
         if (cmd === "lsp") {
             await import("./lsp.js");
             return await new Promise<number>(() => {});
+        }
+        if (cmd === "grammar") {
+            return cmdGrammar(args[1], args[2]);
         }
         switch (cmd) {
             case "check":

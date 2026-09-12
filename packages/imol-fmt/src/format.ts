@@ -106,6 +106,8 @@ function formatStmt(s: Stmt, indent: string): string {
         }
         case "run_plan":
             return `${indent}run plan`;
+        case "await_invoke":
+            return `${indent}await invoke ${s.tool} { ${s.fields.map((f) => `${f.name}: ${formatExpr(f.value, indent)}`).join(", ")} }`;
     }
 }
 
@@ -113,6 +115,7 @@ function formatWorkshop(w: WorkshopDecl, indent: string): string {
     const lines = [`${indent}workshop`];
     lines.push(`${indent}  allow_net ${w.allowNet ? "true" : "false"}`);
     lines.push(`${indent}  allow_write ${w.allowWrite ? "true" : "false"}`);
+    lines.push(`${indent}  allow_shell ${w.allowShell ? "true" : "false"}`);
     for (const b of w.binds) {
         lines.push(`${indent}  bind ${b}`);
     }

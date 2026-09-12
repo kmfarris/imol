@@ -1,0 +1,36 @@
+# IMOL agent automation
+
+Runnable oracle loop (same steps as MCP, no Cursor required).
+
+## CLI
+
+```bash
+npm run imol -- agent loop --task "verify dogfood" --dry-llm examples/dogfood/catalog.imol
+npm run imol -- agent loop --task "patch greet" --patch examples/agent/patch-greet.json examples/greet.imol
+```
+
+Flags:
+
+- `--dry-llm` — prepare + check + workshop-plan on the file on disk (CI default).
+- `--patch path.json` — apply patch in memory on iteration 1.
+- `--max-iter N` — LLM retries when not using `--dry-llm` (needs `IMOL_AGENTBENCH_API_KEY` or `OPENAI_API_KEY`).
+
+Stdout JSON matches [`agent-api.json`](../packages/imol-spec/agent-api.json) `agent_loop`.
+
+## MCP
+
+Tool **`imol_agent_loop`** — same parameters as CLI (`task`, `file`, optional `patch_path`, `dry_llm`, `max_iter`).
+
+## CI
+
+[`.github/workflows/agent-loop.yml`](../.github/workflows/agent-loop.yml) runs `--dry-llm` on dogfood. Optional LLM job uses repository secret `IMOL_AGENTBENCH_API_KEY` via `workflow_dispatch`.
+
+## Cursor Automation (recipe)
+
+1. Trigger: pull request or schedule on this repo.
+2. Enable MCP server **imol** (`scripts/imol-mcp.mjs`).
+3. Agent instructions: link this doc; require `imol_agent_loop` with `dry_llm: true` before suggesting IMOL edits; never `run --approve` via MCP.
+
+## Hooks
+
+Project [`.cursor/hooks.json`](../.cursor/hooks.json): sessionStart reminder + afterFileEdit sanitize on `*.imol`.

@@ -1,6 +1,6 @@
 import { checkModule } from "@imol/check";
 import {
-    capabilitiesFromWorkshop,
+    runCapabilities,
     createExternRegistry,
     runModule,
     runPlanDryRun,
@@ -48,14 +48,14 @@ export class WorkshopSession {
         const dir = this.options.traceDir ?? ".imol-trace";
         await mkdir(dir, { recursive: true });
 
-        const overrides: Partial<import("@imol/run").Capabilities> = {};
-        if (this.options.allowNet) overrides.net = true;
-        if (this.module.workshop?.allowWrite) overrides.write = true;
-        const caps = capabilitiesFromWorkshop(this.module.workshop, overrides);
+        const approved = this.options.approve ?? this.options.planApproved ?? false;
+        let caps = runCapabilities(this.module.workshop, approved);
+        if (this.options.allowNet) {
+            caps = { ...caps, net: true };
+        }
         const binds = this.module.workshop?.binds ?? [];
         const externs = createExternRegistry(caps, binds);
 
-        const approved = this.options.approve ?? this.options.planApproved ?? false;
         const dryRun = this.options.dryRun ?? false;
         const hasPlan = this.module.plans.length > 0;
         const traceHandler = (entry: TraceEntry) => {

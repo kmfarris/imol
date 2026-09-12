@@ -11,6 +11,11 @@ export const EXTERN_CATALOG: ExternMeta[] = [
     { key: "std.fs.list", effect: "io", binds: ["std.fs"] },
     { key: "std.fs.write", effect: "unsafe", binds: ["std.fs"] },
     { key: "tools.filesystem.read", effect: "io", binds: ["tools.filesystem", "std.fs"] },
+    {
+        key: "std.shell.exec",
+        effect: "unsafe",
+        binds: ["std.shell"],
+    },
 ];
 
 /** Workshop bind required for tools generated via `imol tools import` (`from mcp.*`). */

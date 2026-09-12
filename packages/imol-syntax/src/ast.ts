@@ -46,7 +46,8 @@ export type Stmt =
     | { kind: "return"; value: Expr; span: Span }
     | { kind: "expr"; value: Expr; span: Span }
     | { kind: "if_block"; cond: Expr; then: Stmt[]; else: Stmt[]; span: Span }
-    | { kind: "run_plan"; span: Span };
+    | { kind: "run_plan"; span: Span }
+    | { kind: "await_invoke"; tool: string; fields: { name: string; value: Expr }[]; span: Span };
 
 export type FunctionDecl = {
     kind: "function";
@@ -87,6 +88,7 @@ export type WorkshopDecl = {
     kind: "workshop";
     allowNet: boolean;
     allowWrite: boolean;
+    allowShell: boolean;
     binds: string[];
     span: Span;
 };

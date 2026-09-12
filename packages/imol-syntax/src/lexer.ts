@@ -14,6 +14,7 @@ export type TokenKind =
     | "if"
     | "match"
     | "invoke"
+    | "await"
     | "end"
     | "else"
     | "hole"
@@ -21,6 +22,7 @@ export type TokenKind =
     | "bind"
     | "allow_net"
     | "allow_write"
+    | "allow_shell"
     | "plan"
     | "run"
     | "true"
@@ -64,6 +66,7 @@ const KEYWORDS: Record<string, TokenKind> = {
     if: "if",
     match: "match",
     invoke: "invoke",
+    await: "await",
     end: "end",
     else: "else",
     hole: "hole",
@@ -71,6 +74,7 @@ const KEYWORDS: Record<string, TokenKind> = {
     bind: "bind",
     allow_net: "allow_net",
     allow_write: "allow_write",
+    allow_shell: "allow_shell",
     plan: "plan",
     run: "run",
     true: "true",
@@ -93,6 +97,11 @@ export function lex(source: string): Token[] {
             continue;
         }
         if (c === "#") {
+            while (i < source.length && peek() !== "\n") advance();
+            continue;
+        }
+        if (c === "/" && peek(1) === "/") {
+            i += 2;
             while (i < source.length && peek() !== "\n") advance();
             continue;
         }

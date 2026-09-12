@@ -14,7 +14,7 @@ describe("@imol/skill", () => {
         const ids = r.codewords.map((c) => c.id);
         expect(ids.some((id) => id.includes("patch"))).toBe(true);
         expect(r.token_estimate).toBeLessThan(4000);
-        expect(r.spec_version).toBe("0.3");
+        expect(r.spec_version).toBe("0.4");
     });
 
     it("includes mandatory tool policy for agent loop", () => {

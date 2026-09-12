@@ -13,6 +13,8 @@ npm run imol -- agent check examples/dogfood/catalog.imol
 
 Configure Cursor MCP from [`.cursor/mcp.json`](.cursor/mcp.json), reload tools, then call **`imol_skill_prepare`** on `examples/greet.imol`. Full dogfood + MCP loop: **[docs/HAPPY_PATH.md](docs/HAPPY_PATH.md)** and **[docs/ONBOARDING.md](docs/ONBOARDING.md)**.
 
+Runtime preview (shell/async roadmap): **[docs/ROADMAP_RUNTIME.md](docs/ROADMAP_RUNTIME.md)**.
+
 More examples:
 
 ```bash
@@ -58,7 +60,7 @@ MCP (production stdio): configure Cursor with [packages/imol-skill/mcp/cursor-mc
 - `packages/imol-cli` — `imol` command
 - `packages/imol-patch` — `@id` patch application
 - `packages/imol-load` — manifest + multi-file import
-- `packages/imol-spec` — language spec (0.3), agent API JSON
+- `packages/imol-spec` — language spec (0.4), agent API JSON
 - `packages/imol-skill` — flat skill codebook (CSD), router, `imol skill route`, MCP host
 - `examples/` — sample programs (`bad/`, `golden/`)
 

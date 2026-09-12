@@ -10,7 +10,7 @@ export function compilePacket(
 ): { packet: string; tool_policy: string[] } {
     const sections: string[] = [
         "# IMOL skill packet (Compiled Skill Dictionary)",
-        "spec_version: 0.3",
+        "spec_version: 0.4",
         "",
     ];
     if (opts.task) {

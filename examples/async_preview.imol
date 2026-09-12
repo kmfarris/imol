@@ -1,0 +1,17 @@
+module async_preview @id("async-preview-1")
+
+workshop
+  allow_net false
+  bind std.fs
+end
+
+type Result = Ok Text | Err Text
+
+tool read_file from std.fs.read @io
+  { path: Text } -> Result
+
+@io
+function main() -> Unit
+  await invoke read_file { path: "examples/hello.imol" }
+  return ()
+end

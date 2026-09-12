@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { checkModule } from "@imol/check";
 import { loadModuleFromFile } from "@imol/load";
 import { loadCodebook } from "../codebook/load.js";
+import { callChatModel } from "../llm/call-model.js";
 import { loadRouterWeights } from "../router/weights.js";
 import { routeSkills } from "../router/route.js";
 
@@ -33,38 +34,6 @@ export type LlmBenchResult = {
         token_budget: number;
     }>;
 };
-
-async function callModel(system: string, user: string): Promise<string> {
-    const apiKey = process.env.IMOL_AGENTBENCH_API_KEY ?? process.env.OPENAI_API_KEY;
-    const base = process.env.IMOL_AGENTBENCH_BASE_URL ?? "https://api.openai.com/v1";
-    const model = process.env.IMOL_AGENTBENCH_MODEL ?? "gpt-4o-mini";
-    if (!apiKey) {
-        throw new Error("no_api_key");
-    }
-    const res = await fetch(`${base}/chat/completions`, {
-        method: "POST",
-        headers: {
-            Authorization: `Bearer ${apiKey}`,
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            model,
-            temperature: 0,
-            messages: [
-                { role: "system", content: system },
-                { role: "user", content: user },
-            ],
-        }),
-    });
-    if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`LLM HTTP ${res.status}: ${text.slice(0, 300)}`);
-    }
-    const data = (await res.json()) as {
-        choices?: Array<{ message?: { content?: string } }>;
-    };
-    return data.choices?.[0]?.message?.content?.trim() ?? "";
-}
 
 async function checkFileRel(relPath: string, source?: string): Promise<boolean> {
     const abs = join(repoRoot, relPath);
@@ -112,7 +81,7 @@ export async function runLlmBench(k = 3): Promise<LlmBenchResult> {
         let attempts = 0;
         for (let i = 0; i < k; i++) {
             attempts++;
-            const out = await callModel(
+            const out = await callChatModel(
                 system,
                 `${task.prompt}\n\nCurrent file:\n\`\`\`\n${baseline}\n\`\`\``,
             );

@@ -1,0 +1,58 @@
+(* IMOL surface grammar (spec 0.4). Canonical IR is formatter output. *)
+
+module        = "module" ident module_attrs? module_body ;
+module_attrs  = module_attr { module_attr } ;
+module_attr   = "@id" "(" text_literal ")" ;
+module_body   = { import_decl | plan_decl | tool_decl | type_decl | function_decl } ;
+
+workshop_decl = "workshop" workshop_line { workshop_line } "end" ;
+workshop_line = ( "allow_net" boolean
+                | "allow_write" boolean
+                | "allow_shell" boolean
+                | "bind" dotted_path ) ;
+
+import_decl   = "import" dotted_path "as" ident ;
+
+plan_decl     = "plan" invoke_expr { invoke_expr } "end" ;
+
+tool_decl     = "tool" ident "from" dotted_path effect_attr*
+                record_type "->" type_expr ;
+
+type_decl     = "type" ident "=" type_expr ;
+
+function_decl = effect_attr* "function" ident "(" param_list? ")" "->" type_expr
+                stmt_block ;
+
+type_expr     = sum_type | record_type | ident ;
+sum_type      = variant { "|" variant } ;
+variant       = ident [ type_expr ] ;
+record_type   = "{" [ field { "," field } ] "}" ;
+field         = ident ":" type_expr ;
+
+stmt_block    = stmt { stmt } "end" ;
+stmt          = "let" ident type_expr "=" expr
+              | "return" expr
+              | "if" expr stmt_block [ "else" stmt_block ]
+              | "match" expr match_arm { match_arm } "end"
+              | "run" "plan"
+              | "await" invoke_expr
+              | expr ;
+
+match_arm     = ident [ ident ] "->" expr ;
+
+expr          = invoke_expr | fail_expr | binary | primary ;
+invoke_expr   = "invoke" ident record_literal ;
+fail_expr     = "fail" "(" text_literal ")" ;
+binary        = expr "++" expr | expr "==" expr ;
+primary       = text_literal | int_literal | ident | record_literal | "(" expr ")" ;
+record_literal= "{" [ field_init { "," field_init } ] "}" ;
+field_init    = ident ":" expr ;
+
+effect_attr   = "@pure" | "@io" | "@net" | "@unsafe" ;
+boolean       = "true" | "false" ;
+ident         = letter { letter | digit | "_" } ;
+dotted_path   = ident { "." ident } ;
+text_literal  = '"' { character } '"' | '"""' { character } '"""' ;
+int_literal   = digit { digit } ;
+
+(* Line comments: `#` or `//` to end of line. *)

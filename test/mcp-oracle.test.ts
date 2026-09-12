@@ -17,7 +17,7 @@ describe("MCP tools", () => {
         const text = await handleAgentCheck({ file: "examples/greet.imol" });
         const body = JSON.parse(text) as { ok: boolean; spec_version: string };
         expect(body.ok).toBe(true);
-        expect(body.spec_version).toBe("0.3");
+        expect(body.spec_version).toBe("0.4");
     });
 
     it("rejects paths outside workspace", () => {

@@ -6,6 +6,8 @@ import { loadCodebook } from "../codebook/load.js";
 import { estimateTokens } from "../compiler/packet.js";
 import { loadRouterWeights } from "../router/weights.js";
 import { routeSkills } from "../router/route.js";
+import { defaultLoadModule } from "../oracle/agent.js";
+import { agentLoop } from "../oracle/agent-loop.js";
 import { runLlmBench } from "./llm-runner.js";
 
 const pkgRoot = join(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -58,8 +60,15 @@ async function main(): Promise<void> {
 
     const llm = await runLlmBench(3);
 
+    const patchLoop = (await agentLoop(defaultLoadModule, {
+        task: "patch greet-fn by id",
+        file: join(repoRoot, "examples/greet.imol"),
+        patch_path: join(repoRoot, "examples/agent/patch-greet.json"),
+        max_iter: 1,
+    })) as { ok: boolean; final_check?: { ok: boolean } };
+
     const report = {
-        spec_version: "0.3",
+        spec_version: "0.4",
         codeword_recall_at_5: recallTotal ? recallHits / recallTotal : 0,
         scenarios: scenarioResults,
         baselines: {
@@ -69,6 +78,7 @@ async function main(): Promise<void> {
             D_csd_k5: { token_estimate: sampleRoute.token_estimate },
         },
         llm_eval: llm,
+        patch_valid_at_1: patchLoop.final_check?.ok ? 1 : 0,
         metrics_doc: {
             check_pass_at_1: llm.skipped ? "Set IMOL_AGENTBENCH_API_KEY to measure" : "From llm_eval",
             check_pass_at_3: llm.skipped ? "Set IMOL_AGENTBENCH_API_KEY to measure" : "From llm_eval",

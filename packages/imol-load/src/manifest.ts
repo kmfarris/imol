@@ -1,6 +1,11 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
+export type ImolMcpServerManifest = {
+    name: string;
+    command: string;
+};
+
 export type ImolManifest = {
     entry: string;
     spec_version?: string;
@@ -9,6 +14,8 @@ export type ImolManifest = {
         allow_write?: boolean;
     };
     tool_paths?: string[];
+    /** Host-only MCP launch config (not started by IMOL runtime). Forward path: extern `mcp_host.*`. */
+    mcp_servers?: ImolMcpServerManifest[];
 };
 
 export async function readManifest(projectRoot: string): Promise<ImolManifest | undefined> {

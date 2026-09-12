@@ -13,6 +13,7 @@ Commands:
   agent <subcmd>         Machine JSON API for agents (see spec agent-api.json)
   skill <subcmd>         IMOL skill dictionary route / MCP host
   lsp                    Stdio language server (check diagnostics on open/save)
+  grammar show|repair    EBNF reference or dry-run grammar repair JSON
 
 Global:
   imol --help            This message
@@ -32,8 +33,12 @@ export const CMD_HELP: Record<string, string> = {
   imol agent fmt-check <file.imol>
   imol agent patch <file.imol> <patches.json>
   imol agent workshop-plan [file.imol]
+  imol agent loop --task "..." [--dry-llm] [--patch patches.json] [--max-iter N] [file.imol]
 
-Stdout is JSON only. Errors: { ok: false, error, spec_version: "0.3" }`,
+  imol agent sanitize <file.imol> [--write]
+  imol agent sanitize --stdin
+
+Stdout is JSON only. Errors: { ok: false, error, spec_version: "0.4" }`,
     skill: `imol skill route "<task>" [--file path.imol] [--k 5] [--oracle last.json]
   imol skill mcp          Stdio MCP server (skill route + agent tool defs)`,
 };

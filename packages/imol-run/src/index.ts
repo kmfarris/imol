@@ -1,6 +1,7 @@
 export {
     capabilitiesFromWorkshop,
     defaultCapabilities,
+    runCapabilities,
     type Capabilities,
 } from "./capabilities.js";
 export {
