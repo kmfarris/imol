@@ -81,6 +81,15 @@ export function createExternRegistry(
         reg.set("std.fs.write", writeHandler);
     }
 
+    const shellExecHandler: ExternHandler = async () =>
+        errText(
+            "std.shell.exec is catalogued for typing/workshop only; execution is not enabled yet (runtime preview)",
+        );
+
+    if (allowed.has("std.shell.exec")) {
+        reg.set("std.shell.exec", shellExecHandler);
+    }
+
     return reg;
 }
 

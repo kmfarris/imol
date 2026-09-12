@@ -47,6 +47,8 @@ tool <name> from <extern.key> [@io|@net|@pure]...
 
 Bundled extern keys include `std.fs.read`, `std.fs.list`, `std.fs.write` (write requires `allow_write true`).
 
+**Preview:** `std.shell.exec` is recognised at check time with `bind std.shell`; runtime returns a structured `Err` until shell execution is enabled (see [docs/ROADMAP_RUNTIME.md](../../docs/ROADMAP_RUNTIME.md)).
+
 Dynamic **MCP** tools use `from mcp.<toolName>` and require `bind tools.mcp` (or `bind mcp`) in the workshop block. Generate stubs with `imol tools import`.
 
 ## Patch format

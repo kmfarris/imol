@@ -493,6 +493,16 @@ export const CODewORD_ENTRIES: Omit<Codeword, "embedding">[] = [
         tool_policy: [],
     },
     {
+        id: "extern.shell_preview",
+        spec_version: V,
+        tags: ["extern", "shell", "preview"],
+        keywords: ["std.shell.exec", "shell", "unsafe"],
+        expansion:
+            "`std.shell.exec` + `bind std.shell` typechecks; runtime returns Err until allow_shell execution lands. See docs/ROADMAP_RUNTIME.md.",
+        tool_policy: [],
+        examples_ref: ["examples/shell_preview.imol"],
+    },
+    {
         id: "extern.mcp_bind",
         spec_version: V,
         tags: ["extern", "mcp"],

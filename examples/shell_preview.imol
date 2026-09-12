@@ -1,0 +1,21 @@
+module shell_preview @id("shell-preview")
+
+workshop
+  allow_net false
+  allow_write false
+  bind std.shell
+end
+
+type Result = Ok Text | Err Text
+
+tool echo from std.shell.exec @unsafe
+  { command: Text } -> Result
+
+@unsafe
+function main() -> Unit
+  match invoke echo { command: "echo hello" }
+    Ok out -> fail(out)
+    Err msg -> fail(msg)
+  end
+  return ()
+end
