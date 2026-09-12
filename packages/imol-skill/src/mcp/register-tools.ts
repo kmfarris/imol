@@ -5,6 +5,7 @@ import {
     handleAgentCheck,
     handleAgentFmtCheck,
     handleAgentPatch,
+    handleAgentSanitize,
     handleAgentWorkshopPlan,
     handleSkillPrepare,
     handleSkillRoute,
@@ -118,5 +119,17 @@ export function registerImolTools(server: McpServerType): void {
         "Dry-run workshop plan invokes; returns trace and state",
         { file: z.string() },
         async (args) => handleAgentWorkshopPlan({ file: String(args.file ?? "") }),
+    );
+
+    register(
+        server,
+        "imol_agent_sanitize",
+        "Grammar v2 repair + fmt on IMOL source (file or raw source string)",
+        {
+            file: z.string().optional(),
+            source: z.string().optional(),
+            write: z.boolean().optional(),
+        },
+        async (args) => handleAgentSanitize(args),
     );
 }

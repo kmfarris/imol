@@ -6,6 +6,8 @@ import {
     agentCheck,
     agentFmtCheck,
     agentPatch,
+    agentSanitize,
+    agentSanitizeFile,
     agentWorkshopPlan,
     defaultLoadModule,
 } from "../oracle/agent.js";
@@ -98,4 +100,19 @@ export async function handleAgentPatch(args: {
 export async function handleAgentWorkshopPlan(args: { file: string }): Promise<string> {
     const abs = assertPathAllowed(args.file);
     return jsonText(await agentWorkshopPlan(defaultLoadModule, abs));
+}
+
+export async function handleAgentSanitize(args: {
+    file?: string;
+    source?: string;
+    write?: boolean;
+}): Promise<string> {
+    if (args.file) {
+        const abs = assertPathAllowed(args.file);
+        return jsonText(await agentSanitizeFile(abs, args.write ?? false));
+    }
+    if (typeof args.source === "string") {
+        return jsonText(await agentSanitize(args.source));
+    }
+    throw new Error("imol_agent_sanitize requires file or source");
 }

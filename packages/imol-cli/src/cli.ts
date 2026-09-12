@@ -4,7 +4,7 @@ import { loadManifest, loadModuleFromFile } from "@imol/load";
 import { applyPatches, parsePatchFile } from "@imol/patch";
 import { formatModule } from "@imol/fmt";
 import { capabilitiesFromWorkshop, createExternRegistry, runModule } from "@imol/run";
-import { ImolSyntaxError, parse } from "@imol/syntax";
+import { ImolSyntaxError, parse, repairAgentGrammar } from "@imol/syntax";
 import { compareTraces, WorkshopSession } from "@imol/workshop";
 import { readFile, writeFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
@@ -49,6 +49,26 @@ async function resolveEntryPath(argPath: string | undefined): Promise<string> {
 async function loadMod(path: string) {
     const root = dirname(path);
     return loadModuleFromFile(path, { projectRoot: root });
+}
+
+const GRAMMAR_EBNF = join(
+    dirname(fileURLToPath(import.meta.url)),
+    "../../imol-spec/GRAMMAR.ebnf",
+);
+
+async function cmdGrammar(sub: string | undefined, filePath: string | undefined): Promise<number> {
+    if (sub === "show") {
+        process.stdout.write(await readFile(GRAMMAR_EBNF, "utf8"));
+        return 0;
+    }
+    if (sub === "repair" && filePath) {
+        const src = await readFile(resolve(filePath), "utf8");
+        const { source, repairs } = repairAgentGrammar(src);
+        console.log(JSON.stringify({ repairs, source }, null, 2));
+        return 0;
+    }
+    console.error("Usage: imol grammar show | imol grammar repair <file.imol>");
+    return 2;
 }
 
 async function cmdCheck(path: string | undefined, allowHoles: boolean, json: boolean): Promise<number> {
@@ -299,6 +319,9 @@ async function main(): Promise<number> {
         if (cmd === "lsp") {
             await import("./lsp.js");
             return await new Promise<number>(() => {});
+        }
+        if (cmd === "grammar") {
+            return cmdGrammar(args[1], args[2]);
         }
         switch (cmd) {
             case "check":

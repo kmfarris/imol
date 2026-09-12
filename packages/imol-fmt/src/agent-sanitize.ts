@@ -1,10 +1,11 @@
-import { ImolSyntaxError, parse } from "@imol/syntax";
+import { ImolSyntaxError, parseWithRepair, repairAgentGrammar } from "@imol/syntax";
 import { formatModule } from "./format.js";
 
 export type SanitizeStep =
     | "normalized_crlf"
     | "stripped_fences"
     | "trimmed"
+    | "grammar_repair"
     | "formatted";
 
 export function stripMarkdownFences(source: string): string {
@@ -15,8 +16,12 @@ export function stripMarkdownFences(source: string): string {
     return s;
 }
 
-/** Grammar v2 (thin): post-filter common LLM output before parse/fmt. */
-export function sanitizeAgentSource(source: string): { source: string; steps: SanitizeStep[] } {
+/** Pre-parse hygiene + grammar v2 repair pipeline. */
+export function sanitizeAgentSource(source: string): {
+    source: string;
+    steps: SanitizeStep[];
+    grammar_repairs: string[];
+} {
     const steps: SanitizeStep[] = [];
     let s = source;
     if (s.includes("\r\n")) {
@@ -33,26 +38,38 @@ export function sanitizeAgentSource(source: string): { source: string; steps: Sa
         s = trimmed;
         steps.push("trimmed");
     }
+    const { source: repaired, repairs } = repairAgentGrammar(s);
+    if (repairs.length > 0) {
+        s = repaired;
+        steps.push("grammar_repair");
+    }
     if (s.length && !s.endsWith("\n")) {
         s = `${s}\n`;
     }
-    return { source: s, steps };
+    return { source: s, steps, grammar_repairs: repairs };
 }
 
 export function sanitizeAndFormat(source: string): {
     ok: boolean;
     output: string;
     steps: SanitizeStep[];
+    grammar_repairs: string[];
     parse_error?: string;
 } {
-    const { source: clean, steps } = sanitizeAgentSource(source);
+    const { source: clean, steps, grammar_repairs } = sanitizeAgentSource(source);
     try {
-        const mod = parse(clean);
+        const { module: mod, repairs: parseRepairs } = parseWithRepair(clean);
+        const allGrammar = [...grammar_repairs, ...parseRepairs];
         const formatted = formatModule(mod);
         if (formatted !== clean) {
             steps.push("formatted");
         }
-        return { ok: true, output: formatted, steps };
+        return {
+            ok: true,
+            output: formatted,
+            steps,
+            grammar_repairs: [...new Set(allGrammar)],
+        };
     } catch (e) {
         const msg =
             e instanceof ImolSyntaxError
@@ -60,6 +77,12 @@ export function sanitizeAndFormat(source: string): {
                 : e instanceof Error
                   ? e.message
                   : String(e);
-        return { ok: false, output: clean, steps, parse_error: msg };
+        return {
+            ok: false,
+            output: clean,
+            steps,
+            grammar_repairs,
+            parse_error: msg,
+        };
     }
 }

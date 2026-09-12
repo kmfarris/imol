@@ -479,7 +479,7 @@ export const CODewORD_ENTRIES: Omit<Codeword, "embedding">[] = [
         tags: ["grammar", "fmt", "agent"],
         keywords: ["sanitize", "fences", "llm output", "fmt-fix"],
         expansion:
-            "Grammar v2 (thin): `imol agent sanitize [file] [--write]` or `--stdin` strips ``` fences, normalizes newlines, parse→canonical fmt before check.",
+            "Grammar v2: repair pipeline + parseWithRepair + fmt. `imol agent sanitize`, MCP `imol_agent_sanitize`, `imol grammar show|repair`. See GRAMMAR.ebnf.",
         tool_policy: ["Run imol agent sanitize on raw LLM IMOL before imol agent check."],
         examples_ref: ["docs/HAPPY_PATH.md"],
     },

@@ -96,6 +96,11 @@ export function lex(source: string): Token[] {
             while (i < source.length && peek() !== "\n") advance();
             continue;
         }
+        if (c === "/" && peek(1) === "/") {
+            i += 2;
+            while (i < source.length && peek() !== "\n") advance();
+            continue;
+        }
 
         if (c === "@" && peek(1) === "i" && source.slice(i, i + 3) === "@id") {
             i += 3;

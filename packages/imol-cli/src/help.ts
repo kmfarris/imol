@@ -13,6 +13,7 @@ Commands:
   agent <subcmd>         Machine JSON API for agents (see spec agent-api.json)
   skill <subcmd>         IMOL skill dictionary route / MCP host
   lsp                    Stdio language server (check diagnostics on open/save)
+  grammar show|repair    EBNF reference or dry-run grammar repair JSON
 
 Global:
   imol --help            This message

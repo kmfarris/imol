@@ -71,9 +71,17 @@ Operations: `replace_decl_by_id`, `insert_after_id`, `delete_decl_by_id`.
 
 `imol lsp` runs a stdio LSP that publishes `checkModule` diagnostics on open/save for `*.imol` files (multi-file via import merge on disk).
 
-## Agent output (grammar v2 thin)
+## Comments
 
-`imol agent sanitize [file.imol] [--write]` or `imol agent sanitize --stdin` strips markdown fences, normalizes newlines, and parse→fmt before check. Project hook: `.cursor/hooks/imol-after-imol-edit.mjs` on agent `Write` of `*.imol`.
+Line comments begin with `#` or `//` and run to end of line.
+
+## Grammar reference
+
+Formal surface grammar: [GRAMMAR.ebnf](GRAMMAR.ebnf). CLI: `imol grammar show`.
+
+## Agent output (grammar v2)
+
+`imol agent sanitize` / MCP `imol_agent_sanitize` runs the repair pipeline (smart quotes, `//` comments, orphan `@id` before `plan`, etc.), then `parseWithRepair` and canonical fmt. Project hook: `.cursor/hooks/imol-after-imol-edit.mjs` on agent `Write` of `*.imol`. Dry-run repairs: `imol grammar repair file.imol`.
 
 ## Types
 
