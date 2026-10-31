@@ -1,6 +1,7 @@
 {
   "name": "imol",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "bin": {
     "imol": "packages/imol-cli/dist/cli.js"
