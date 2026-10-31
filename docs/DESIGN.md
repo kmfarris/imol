@@ -1,8 +1,8 @@
 # Design: check before patch, plan before side effects
 
-IMOL targets a failure mode common in agent toolchains: the model emits a patch or invokes a filesystem tool before the program is even well-formed. IMOL keeps **structure on the critical path**—parse, diagnose, canonicalize—so agents operate on a verified intermediate representation instead of raw text diffs alone.
+Patches and tool invokes often arrive before the module parses. IMOL runs parse → diagnose → canonical fmt first; agents edit against that IR, not raw text alone.
 
-## Problem framing
+## Editing model
 
 LLM-authored edits arrive as partial syntax, duplicated declarations, or JSON tool payloads that assume a valid module. Applying them blindly corrupts the file or hides errors until runtime. IMOL separates three concerns:
 
