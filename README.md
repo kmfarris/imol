@@ -90,7 +90,6 @@ Example editor config: [`packages/imol-skill/mcp/cursor-mcp.example.json`](packa
 | `imol-cli` | The `imol` command |
 | `imol-patch` | Edits by name tag |
 | `imol-load` | Project files and multi-file programs |
-| `imol-spec` | Language reference and assistant message format |
 | `imol-skill` | Command guide for assistants and editor connection |
 
-Sample programs are in `examples/`, including deliberately broken ones in `bad/`.
+The language reference, grammar, and assistant message format are in [`packages/imol-spec/`](packages/imol-spec/). Sample programs are in `examples/`, including deliberately broken ones in `bad/`.

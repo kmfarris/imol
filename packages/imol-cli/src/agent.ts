@@ -1,4 +1,5 @@
 import { agentFail } from "@kmfarris/imol-skill/oracle";
+import type { ImolSyntaxError } from "@kmfarris/imol-syntax";
 
 export {
     AGENT_SPEC_VERSION,
@@ -21,4 +22,8 @@ export function printAgentJson(value: object): void {
 
 export function printAgentError(message: string): void {
     console.log(JSON.stringify(agentFail(message)));
+}
+
+export function printAgentSyntaxError(e: ImolSyntaxError): void {
+    console.log(JSON.stringify({ ...agentFail(e.message), code: e.code, span: e.span }));
 }

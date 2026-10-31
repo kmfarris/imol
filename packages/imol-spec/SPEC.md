@@ -49,7 +49,7 @@ tool <name> from <extern.key> [@io|@net|@pure]...
   { field: Type, ... } -> <output Type>
 ```
 
-Bundled extern keys include `std.fs.read`, `std.fs.list`, `std.fs.write` (write requires `allow_write true`).
+Bundled extern keys include `std.fs.read`, `std.fs.list`, `std.fs.write` (write requires `allow_write true` and `imol run --approve` or `imol workshop --approve`; without approval the call returns `Err`).
 
 **Shell:** `std.shell.exec` with `bind std.shell` and `allow_shell true`. Runtime uses an allowlisted binary set (default `echo`, `pwd`, `node`; override with env `IMOL_SHELL_ALLOWLIST`). Requires `imol run --approve` (same gate as `run plan`). No shell interpolation (`execFile`, not `/bin/sh -c`).
 

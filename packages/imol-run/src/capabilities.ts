@@ -31,7 +31,7 @@ export function runCapabilities(
     workshop?: { allowNet: boolean; allowWrite: boolean; allowShell?: boolean },
     approved?: boolean,
 ): Capabilities {
-    const base = capabilitiesFromWorkshop(workshop);
+    const base = capabilitiesFromWorkshop(workshop, { write: false });
     if (!approved) {
         return base;
     }

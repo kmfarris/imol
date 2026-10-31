@@ -34,9 +34,11 @@ function commandFromArgs(args: Value[]): string | undefined {
 export function createExternRegistry(
     caps: Capabilities,
     binds: string[] = [],
+    declaredWrite: boolean = caps.write,
 ): ExternRegistry {
     const reg: ExternRegistry = new Map();
-    const allowed = allowedExternKeys(binds, caps.write);
+    // Registered when declared; the handler itself refuses until caps.write (approval) is granted.
+    const allowed = allowedExternKeys(binds, declaredWrite || caps.write);
 
     const readHandler: ExternHandler = async (args) => {
         const p = pathFromArgs(args);
@@ -62,7 +64,7 @@ export function createExternRegistry(
     };
 
     const writeHandler: ExternHandler = async (args) => {
-        if (!caps.write) return errText("write not allowed");
+        if (!caps.write) return errText("write not allowed (need allow_write and --approve)");
         const pathVal = args[0];
         if (!pathVal || pathVal.kind !== "record") return errText("bad args");
         const path = pathVal.fields.get("path");

@@ -20,6 +20,7 @@ import {
     agentLoop,
     printAgentError,
     printAgentJson,
+    printAgentSyntaxError,
 } from "./agent.js";
 import { CMD_HELP, TOP_HELP } from "./help.js";
 import { cmdSkillRoute } from "@kmfarris/imol-skill";
@@ -114,7 +115,7 @@ async function cmdRun(path: string | undefined, approve: boolean): Promise<numbe
         return 1;
     }
     const caps = runCapabilities(mod.workshop, approve);
-    const externs = createExternRegistry(caps, mod.workshop?.binds ?? []);
+    const externs = createExternRegistry(caps, mod.workshop?.binds ?? [], mod.workshop?.allowWrite ?? false);
     await runModule(mod, externs, {
         capabilities: caps,
         planApproved: approve,
@@ -127,6 +128,12 @@ async function cmdPatch(imolPath: string, patchPath: string, write: boolean): Pr
     const patchJson = await readSource(patchPath);
     const out = applyPatches(source, parsePatchFile(patchJson));
     if (write) {
+        const check = checkModule(parse(out));
+        if (!check.ok) {
+            printDiagnostics(check.diagnostics);
+            console.error("check failed; file not written");
+            return 1;
+        }
         await writeFile(imolPath, out, "utf8");
     } else {
         process.stdout.write(out);
@@ -290,6 +297,10 @@ async function cmdAgent(sub: string | undefined, pos: string[], flags: Set<strin
                 return 2;
         }
     } catch (e) {
+        if (e instanceof ImolSyntaxError) {
+            printAgentSyntaxError(e);
+            return 1;
+        }
         printAgentError(e instanceof Error ? e.message : String(e));
         return 1;
     }
@@ -311,7 +322,7 @@ async function main(): Promise<number> {
     }
     try {
         if (cmd === "agent") {
-            return cmdAgent(args[1], args.slice(2), flags);
+            return await cmdAgent(args[1], args.slice(2), flags);
         }
         if (cmd === "skill") {
             const sub = args[1];
@@ -337,7 +348,7 @@ async function main(): Promise<number> {
                     console.error('Usage: imol skill route "<task>" [--file path.imol] [--k 5]');
                     return 2;
                 }
-                return cmdSkillRoute(task, file, k, oracle);
+                return await cmdSkillRoute(task, file, k, oracle);
             }
             if (sub === "mcp") {
                 const serverPath = fileURLToPath(import.meta.resolve("@kmfarris/imol-skill/mcp"));
@@ -356,33 +367,33 @@ async function main(): Promise<number> {
             return await new Promise<number>(() => {});
         }
         if (cmd === "grammar") {
-            return cmdGrammar(args[1], args[2]);
+            return await cmdGrammar(args[1], args[2]);
         }
         switch (cmd) {
             case "check":
-                return cmdCheck(args[1], flags.has("--allow-holes"), flags.has("--json"));
+                return await cmdCheck(args[1], flags.has("--allow-holes"), flags.has("--json"));
             case "fmt":
                 if (!args[1]) return 2;
-                return cmdFmt(args[1], flags.has("--write"));
+                return await cmdFmt(args[1], flags.has("--write"));
             case "run":
-                return cmdRun(args[1], flags.has("--approve"));
+                return await cmdRun(args[1], flags.has("--approve"));
             case "patch":
                 if (!args[1] || !args[2]) return 2;
-                return cmdPatch(args[1], args[2], flags.has("--write"));
+                return await cmdPatch(args[1], args[2], flags.has("--write"));
             case "tools":
                 if (args[1] === "import" && args[2]) {
-                    return cmdToolsImport(args[2], args[3]);
+                    return await cmdToolsImport(args[2], args[3]);
                 }
                 console.error("Usage: imol tools import mcp.json [out.imol]");
                 return 2;
             case "workshop":
                 if (args[1] === "trace") {
-                    return cmdWorkshop(undefined, false, false, "trace", args[2], undefined);
+                    return await cmdWorkshop(undefined, false, false, "trace", args[2], undefined);
                 }
                 if (args[1] === "replay") {
-                    return cmdWorkshop(undefined, false, false, "replay", args[2], args[3]);
+                    return await cmdWorkshop(undefined, false, false, "replay", args[2], args[3]);
                 }
-                return cmdWorkshop(
+                return await cmdWorkshop(
                     args[1],
                     flags.has("--dry-run"),
                     flags.has("--approve"),

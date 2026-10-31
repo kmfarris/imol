@@ -128,9 +128,9 @@ function formatImport(i: ImportDecl): string {
 }
 
 function formatTool(t: ToolDecl): string {
+    const attrs = formatAttrs(t.attrs).trimEnd();
     return (
-        formatAttrs(t.attrs) +
-        `tool ${t.name} from ${t.from}\n` +
+        `tool ${t.name} from ${t.from}${attrs ? ` ${attrs}` : ""}\n` +
         `  ${formatType(t.inputType)} -> ${formatType(t.outputType)}`
     );
 }

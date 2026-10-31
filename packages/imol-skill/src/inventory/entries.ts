@@ -114,7 +114,7 @@ export const CODewORD_ENTRIES: Omit<Codeword, "embedding">[] = [
         spec_version: V,
         tags: ["effect", "unsafe"],
         keywords: ["unsafe", "write", "allow_write"],
-        expansion: "`@unsafe` / `std.fs.write` needs `allow_write true` in workshop.",
+        expansion: "`@unsafe` / `std.fs.write` needs `allow_write true` in workshop and `--approve` to take effect.",
         tool_policy: [],
     },
     {
@@ -278,7 +278,7 @@ export const CODewORD_ENTRIES: Omit<Codeword, "embedding">[] = [
         spec_version: V,
         tags: ["extern", "write"],
         keywords: ["std.fs.write", "write", "content"],
-        expansion: "`std.fs.write` requires workshop `allow_write true` and bind std.fs.",
+        expansion: "`std.fs.write` requires workshop `allow_write true`, bind std.fs, and `--approve`; without approval it returns Err.",
         tool_policy: [],
     },
     {

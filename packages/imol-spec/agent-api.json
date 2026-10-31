@@ -114,6 +114,8 @@
       "properties": {
         "ok": { "const": false },
         "error": { "type": "string" },
+        "code": { "type": "string" },
+        "span": { "type": "object" },
         "spec_version": { "$ref": "#/$defs/spec_version" }
       }
     }

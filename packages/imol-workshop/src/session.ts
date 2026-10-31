@@ -54,7 +54,7 @@ export class WorkshopSession {
             caps = { ...caps, net: true };
         }
         const binds = this.module.workshop?.binds ?? [];
-        const externs = createExternRegistry(caps, binds);
+        const externs = createExternRegistry(caps, binds, this.module.workshop?.allowWrite ?? false);
 
         const dryRun = this.options.dryRun ?? false;
         const hasPlan = this.module.plans.length > 0;

@@ -41,6 +41,16 @@ for (const name of await readdir(join(root, "examples"))) {
         console.error(`example check failed: ${name}`, diagnosticsToJson(check.diagnostics));
         failed++;
     }
+    try {
+        const once = formatModule(parse(src));
+        if (formatModule(parse(once)) !== once) {
+            console.error(`example fmt not idempotent: ${name}`);
+            failed++;
+        }
+    } catch (e) {
+        console.error(`example fmt output does not parse: ${name}`, e instanceof Error ? e.message : e);
+        failed++;
+    }
 }
 
 const patchGreet = join(root, "examples/agent/patch-greet.json");

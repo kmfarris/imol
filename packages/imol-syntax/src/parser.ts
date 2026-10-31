@@ -313,6 +313,7 @@ class Parser {
             if (this.at("colon")) this.advance();
             const ftype = this.parseTypeExpr();
             fields.push({ name: fname, type: ftype });
+            if (this.at("comma")) this.advance();
         }
         this.expect("rbrace", "Expected '}'");
         return { kind: "record", fields, span: start };
