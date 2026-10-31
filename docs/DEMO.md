@@ -1,6 +1,6 @@
 # Five-minute demonstration
 
-Record a terminal cast from a clean clone after `npm install && npm run build`.
+From a clone, after `npm install && npm run build`.
 
 ## 1. Check
 
@@ -8,7 +8,7 @@ Record a terminal cast from a clean clone after `npm install && npm run build`.
 npm run imol -- agent check examples/dogfood/catalog.imol
 ```
 
-Expect JSON on stdout: `ok`, `has_holes`, `diagnostics`, `entry`, `spec_version: "0.4"`.
+JSON on stdout includes `ok`, `has_holes`, `diagnostics`, `entry`, and `spec_version: "0.4"`.
 
 ## 2. Format gate
 
@@ -16,15 +16,15 @@ Expect JSON on stdout: `ok`, `has_holes`, `diagnostics`, `entry`, `spec_version:
 npm run imol -- agent fmt-check examples/dogfood/catalog.imol
 ```
 
-Shows whether canonical fmt would change the file.
+Reports whether saving canonical format would change the file.
 
-## 3. Patch (dry)
+## 3. Patch (memory only)
 
 ```bash
 npm run imol -- agent patch examples/dogfood/catalog.imol /path/to/patches.json
 ```
 
-Patches apply in memory; response includes nested `check` without writing disk.
+Applies patches in memory. The response includes a nested `check`. Disk is unchanged.
 
 ## 4. Workshop plan
 
@@ -32,12 +32,12 @@ Patches apply in memory; response includes nested `check` without writing disk.
 npm run imol -- agent workshop-plan examples/dogfood/catalog.imol
 ```
 
-Dry-run plan invokes; inspect `trace` and `trace_path` for intended side effects before `--approve`.
+Dry-runs plan invokes. Read `trace` / `trace_path` before using `--approve`.
 
-## 5. Full gate
+## 5. Full bar
 
 ```bash
 npm run check
 ```
 
-Build, unit tests, and conformance scripts—use this before tagging a release.
+Build, tests, and conformance—the command used before tagging a release.
