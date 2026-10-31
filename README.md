@@ -60,7 +60,7 @@ MCP (production stdio): configure Cursor with [packages/imol-skill/mcp/cursor-mc
 - `packages/imol-cli` — `imol` command
 - `packages/imol-patch` — `@id` patch application
 - `packages/imol-load` — manifest + multi-file import
-- `packages/imol-spec` — language spec (0.4), agent API JSON
+- `packages/imol-spec` — language spec (0.5 surface, 0.4 agent JSON); see [`docs/DESIGN.md`](docs/DESIGN.md)
 - `packages/imol-skill` — flat skill codebook (CSD), router, `imol skill route`, MCP host
 - `examples/` — sample programs (`bad/`, `golden/`)
 
