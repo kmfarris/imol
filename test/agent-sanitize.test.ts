@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { sanitizeAndFormat, stripMarkdownFences } from "@imol/fmt";
+import { sanitizeAndFormat, stripMarkdownFences } from "@kmfarris/imol-fmt";
 
 describe("agent sanitize", () => {
     it("strips markdown fences and formats", () => {

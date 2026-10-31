@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatModule } from "@imol/fmt";
+import { formatModule } from "@kmfarris/imol-fmt";
 import { parse } from "../src/index.js";
 
 import { readFileSync } from "node:fs";

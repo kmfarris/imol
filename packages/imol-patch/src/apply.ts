@@ -1,4 +1,4 @@
-import { formatModule } from "@imol/fmt";
+import { formatModule } from "@kmfarris/imol-fmt";
 import {
     buildDeclIndex,
     getDeclById,
@@ -7,7 +7,7 @@ import {
     type ModuleDecl,
     type ToolDecl,
     type TypeDecl,
-} from "@imol/syntax";
+} from "@kmfarris/imol-syntax";
 import type { PatchFile, PatchOp } from "./types.js";
 
 export class PatchError extends Error {

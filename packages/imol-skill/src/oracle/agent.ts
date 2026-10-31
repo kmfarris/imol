@@ -1,9 +1,9 @@
-import { checkModule, diagnosticsToJson } from "@imol/check";
-import { formatModule, sanitizeAndFormat } from "@imol/fmt";
-import { loadModuleFromFile } from "@imol/load";
-import { applyPatches, parsePatchFile } from "@imol/patch";
-import { parse, type ModuleDecl } from "@imol/syntax";
-import { WorkshopSession } from "@imol/workshop";
+import { checkModule, diagnosticsToJson } from "@kmfarris/imol-check";
+import { formatModule, sanitizeAndFormat } from "@kmfarris/imol-fmt";
+import { loadModuleFromFile } from "@kmfarris/imol-load";
+import { applyPatches, parsePatchFile } from "@kmfarris/imol-patch";
+import { parse, type ModuleDecl } from "@kmfarris/imol-syntax";
+import { WorkshopSession } from "@kmfarris/imol-workshop";
 import { dirname, resolve } from "node:path";
 import { readFile, writeFile } from "node:fs/promises";
 

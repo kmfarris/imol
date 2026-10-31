@@ -59,7 +59,7 @@ imol check examples/greet.imol
 For MCP without Cursor project config:
 
 ```bash
-npm link -w @imol/skill
+npm link -w @kmfarris/imol-skill
 imol-mcp
 # or: imol skill mcp
 ```

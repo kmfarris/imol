@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import { checkModule } from "@imol/check";
-import { parse } from "@imol/syntax";
+import { checkModule } from "@kmfarris/imol-check";
+import { parse } from "@kmfarris/imol-syntax";
 import { mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";

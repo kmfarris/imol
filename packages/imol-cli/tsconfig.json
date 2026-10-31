@@ -4,9 +4,9 @@
     "outDir": "dist",
     "rootDir": "src",
     "paths": {
-      "@imol/skill": ["../imol-skill/dist/index.d.ts"],
-      "@imol/skill/oracle": ["../imol-skill/dist/oracle/agent.d.ts"],
-      "@imol/skill/*": ["../imol-skill/dist/*"]
+      "@kmfarris/imol-skill": ["../imol-skill/dist/index.d.ts"],
+      "@kmfarris/imol-skill/oracle": ["../imol-skill/dist/oracle/agent.d.ts"],
+      "@kmfarris/imol-skill/*": ["../imol-skill/dist/*"]
     }
   },
   "include": ["src/**/*"]

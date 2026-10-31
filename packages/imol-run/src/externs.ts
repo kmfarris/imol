@@ -1,4 +1,4 @@
-import { allowedExternKeys } from "@imol/syntax";
+import { allowedExternKeys } from "@kmfarris/imol-syntax";
 import type { Capabilities } from "./capabilities.js";
 import { parseShellCommand, shellAllowlist } from "./shell-allowlist.js";
 import type { Value } from "./value.js";

@@ -27,5 +27,5 @@ Preview and planned work beyond spec 0.4.
 ## Next engineering steps
 
 1. Implement `std.shell.exec` behind `workshop allow_shell true` (new capability flag).
-2. Prototype async trace in `@imol/workshop` without changing check semantics.
+2. Prototype async trace in `@kmfarris/imol-workshop` without changing check semantics.
 3. LLM bench tasks for shell + async once syntax exists.

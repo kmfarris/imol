@@ -7,8 +7,8 @@ import type {
     Pattern,
     Stmt,
     TypeExpr,
-} from "@imol/syntax";
-import { isExternAllowed, isKnownExternKey } from "@imol/syntax";
+} from "@kmfarris/imol-syntax";
+import { isExternAllowed, isKnownExternKey } from "@kmfarris/imol-syntax";
 import { attachDeclIds } from "./enrich.js";
 import { CheckResult, type Diagnostic } from "./diagnostic.js";
 
@@ -157,7 +157,7 @@ export type CheckOptions = {
 };
 
 function collectNameCollisions(mod: ModuleDecl, diags: Diagnostic[]): void {
-    const groups: { items: { name: string; span: import("@imol/syntax").Span }[]; label: string }[] =
+    const groups: { items: { name: string; span: import("@kmfarris/imol-syntax").Span }[]; label: string }[] =
         [
             { items: mod.tools, label: "tool" },
             { items: mod.functions, label: "function" },
@@ -299,7 +299,7 @@ export function checkModule(mod: ModuleDecl, options: CheckOptions = {}): CheckR
                 break;
             }
             case "await_invoke": {
-                const inv: import("@imol/syntax").Expr = {
+                const inv: import("@kmfarris/imol-syntax").Expr = {
                     kind: "invoke",
                     tool: stmt.tool,
                     fields: stmt.fields,

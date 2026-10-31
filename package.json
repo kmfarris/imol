@@ -10,10 +10,10 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w @imol/syntax -w @imol/fmt -w @imol/check -w @imol/patch -w @imol/load -w @imol/run -w @imol/workshop -w @imol/skill -w @imol/cli && npm run codebook:build -w @imol/skill",
-    "skill:dataset": "npm run build -w @imol/skill && npm run dataset:synth -w @imol/skill",
-    "skill:train": "npm run skill:dataset && npm run router:train -w @imol/skill",
-    "skill:bench": "npm run build -w @imol/skill && npm run bench -w @imol/skill",
+    "build": "npm run build -w @kmfarris/imol-syntax -w @kmfarris/imol-fmt -w @kmfarris/imol-check -w @kmfarris/imol-patch -w @kmfarris/imol-load -w @kmfarris/imol-run -w @kmfarris/imol-workshop -w @kmfarris/imol-skill -w @kmfarris/imol-cli && npm run codebook:build -w @kmfarris/imol-skill",
+    "skill:dataset": "npm run build -w @kmfarris/imol-skill && npm run dataset:synth -w @kmfarris/imol-skill",
+    "skill:train": "npm run skill:dataset && npm run router:train -w @kmfarris/imol-skill",
+    "skill:bench": "npm run build -w @kmfarris/imol-skill && npm run bench -w @kmfarris/imol-skill",
     "test": "vitest run --no-file-parallelism",
     "conformance": "npm run build && node scripts/conformance.mjs",
     "check": "npm run build && vitest run && npm run conformance",

@@ -1,4 +1,4 @@
-import { ImolSyntaxError, parseWithRepair, repairAgentGrammar } from "@imol/syntax";
+import { ImolSyntaxError, parseWithRepair, repairAgentGrammar } from "@kmfarris/imol-syntax";
 import { formatModule } from "./format.js";
 
 export type SanitizeStep =

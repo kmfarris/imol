@@ -1,5 +1,5 @@
 {
-  "name": "@imol/syntax",
+  "name": "@kmfarris/imol-syntax",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -12,5 +12,18 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kmfarris/imol.git",
+    "directory": "packages/imol-syntax"
+  },
+  "homepage": "https://github.com/kmfarris/imol",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }

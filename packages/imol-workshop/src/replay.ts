@@ -1,4 +1,4 @@
-import type { TraceEntry } from "@imol/run";
+import type { TraceEntry } from "@kmfarris/imol-run";
 
 export type TraceMismatch = {
     index: number;

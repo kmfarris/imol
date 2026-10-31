@@ -1,5 +1,5 @@
 {
-  "name": "@imol/workshop",
+  "name": "@kmfarris/imol-workshop",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -14,8 +14,21 @@
     "build": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@imol/check": "0.1.0",
-    "@imol/run": "0.1.0",
-    "@imol/syntax": "0.1.0"
+    "@kmfarris/imol-check": "0.1.0",
+    "@kmfarris/imol-run": "0.1.0",
+    "@kmfarris/imol-syntax": "0.1.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kmfarris/imol.git",
+    "directory": "packages/imol-workshop"
+  },
+  "homepage": "https://github.com/kmfarris/imol",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }

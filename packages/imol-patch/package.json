@@ -1,5 +1,5 @@
 {
-  "name": "@imol/patch",
+  "name": "@kmfarris/imol-patch",
   "version": "0.2.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -14,7 +14,20 @@
     "build": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@imol/fmt": "0.1.0",
-    "@imol/syntax": "0.1.0"
+    "@kmfarris/imol-fmt": "0.1.0",
+    "@kmfarris/imol-syntax": "0.1.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kmfarris/imol.git",
+    "directory": "packages/imol-patch"
+  },
+  "homepage": "https://github.com/kmfarris/imol",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }

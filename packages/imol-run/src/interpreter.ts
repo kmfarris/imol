@@ -1,4 +1,4 @@
-import type { Attribute, Expr, FunctionDecl, ModuleDecl, Stmt } from "@imol/syntax";
+import type { Attribute, Expr, FunctionDecl, ModuleDecl, Stmt } from "@kmfarris/imol-syntax";
 import type { Capabilities } from "./capabilities.js";
 import type { ExternRegistry } from "./externs.js";
 import { type Value, valueToString } from "./value.js";
@@ -67,7 +67,7 @@ export class ImolRuntimeError extends Error {
 
 function moduleMaps(mod: ModuleDecl): {
     fns: Map<string, FunctionDecl>;
-    tools: Map<string, import("@imol/syntax").ToolDecl>;
+    tools: Map<string, import("@kmfarris/imol-syntax").ToolDecl>;
 } {
     const fns = new Map<string, FunctionDecl>();
     for (const f of mod.functions) {
@@ -112,7 +112,7 @@ async function evalFunction(
     fn: FunctionDecl,
     mod: ModuleDecl,
     fns: Map<string, FunctionDecl>,
-    tools: Map<string, import("@imol/syntax").ToolDecl>,
+    tools: Map<string, import("@kmfarris/imol-syntax").ToolDecl>,
     externs: ExternRegistry,
     options: RunOptions,
     closure: Map<string, Value>,
@@ -142,7 +142,7 @@ async function evalStmt(
     env: Map<string, Value>,
     mod: ModuleDecl,
     fns: Map<string, FunctionDecl>,
-    tools: Map<string, import("@imol/syntax").ToolDecl>,
+    tools: Map<string, import("@kmfarris/imol-syntax").ToolDecl>,
     externs: ExternRegistry,
     options: RunOptions,
     fn: FunctionDecl,
@@ -216,7 +216,7 @@ async function evalExpr(
     env: Map<string, Value>,
     mod: ModuleDecl,
     fns: Map<string, FunctionDecl>,
-    tools: Map<string, import("@imol/syntax").ToolDecl>,
+    tools: Map<string, import("@kmfarris/imol-syntax").ToolDecl>,
     externs: ExternRegistry,
     options: RunOptions,
 ): Promise<Value> {
@@ -356,7 +356,7 @@ async function evalCall(
     env: Map<string, Value>,
     mod: ModuleDecl,
     fns: Map<string, FunctionDecl>,
-    tools: Map<string, import("@imol/syntax").ToolDecl>,
+    tools: Map<string, import("@kmfarris/imol-syntax").ToolDecl>,
     externs: ExternRegistry,
     options: RunOptions,
 ): Promise<Value> {

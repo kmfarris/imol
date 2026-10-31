@@ -1,7 +1,7 @@
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { agentLoop, defaultLoadModule } from "@imol/skill/oracle";
+import { agentLoop, defaultLoadModule } from "@kmfarris/imol-skill/oracle";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 

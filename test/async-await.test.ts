@@ -1,9 +1,9 @@
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { checkModule } from "@imol/check";
-import { loadModuleFromFile } from "@imol/load";
-import { createExternRegistry, runCapabilities, runModule, type TraceEntry } from "@imol/run";
+import { checkModule } from "@kmfarris/imol-check";
+import { loadModuleFromFile } from "@kmfarris/imol-load";
+import { createExternRegistry, runCapabilities, runModule, type TraceEntry } from "@kmfarris/imol-run";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const asyncPath = join(root, "examples/async_preview.imol");

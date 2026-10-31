@@ -1,4 +1,4 @@
-import type { Span } from "@imol/syntax";
+import type { Span } from "@kmfarris/imol-syntax";
 
 export type Diagnostic = {
     code: string;

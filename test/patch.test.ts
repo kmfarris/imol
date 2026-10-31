@@ -2,9 +2,9 @@ import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { checkModule } from "@imol/check";
-import { applyPatches } from "@imol/patch";
-import { parse } from "@imol/syntax";
+import { checkModule } from "@kmfarris/imol-check";
+import { applyPatches } from "@kmfarris/imol-patch";
+import { parse } from "@kmfarris/imol-syntax";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 

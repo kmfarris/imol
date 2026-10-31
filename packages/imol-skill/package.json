@@ -1,5 +1,5 @@
 {
-  "name": "@imol/skill",
+  "name": "@kmfarris/imol-skill",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -43,13 +43,29 @@
     "bench": "node dist/bench/run.js"
   },
   "dependencies": {
-    "@imol/check": "0.1.0",
-    "@imol/fmt": "0.1.0",
-    "@imol/load": "0.1.0",
-    "@imol/patch": "0.2.0",
-    "@imol/syntax": "0.1.0",
-    "@imol/workshop": "0.1.0",
+    "@kmfarris/imol-check": "0.1.0",
+    "@kmfarris/imol-fmt": "0.1.0",
+    "@kmfarris/imol-load": "0.1.0",
+    "@kmfarris/imol-patch": "0.2.0",
+    "@kmfarris/imol-syntax": "0.1.0",
+    "@kmfarris/imol-workshop": "0.1.0",
     "@modelcontextprotocol/sdk": "^1.12.0",
     "zod": "^3.25.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kmfarris/imol.git",
+    "directory": "packages/imol-skill"
+  },
+  "homepage": "https://github.com/kmfarris/imol",
+  "files": [
+    "dist",
+    "codebook",
+    "mcp",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }

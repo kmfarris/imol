@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-import { checkModule, diagnosticsToJson } from "@imol/check";
-import { loadManifest, loadModuleFromFile } from "@imol/load";
-import { applyPatches, parsePatchFile } from "@imol/patch";
-import { formatModule } from "@imol/fmt";
-import { createExternRegistry, runCapabilities, runModule } from "@imol/run";
-import { ImolSyntaxError, parse, repairAgentGrammar } from "@imol/syntax";
-import { compareTraces, WorkshopSession } from "@imol/workshop";
+import { checkModule, diagnosticsToJson } from "@kmfarris/imol-check";
+import { loadManifest, loadModuleFromFile } from "@kmfarris/imol-load";
+import { applyPatches, parsePatchFile } from "@kmfarris/imol-patch";
+import { formatModule } from "@kmfarris/imol-fmt";
+import { createExternRegistry, runCapabilities, runModule } from "@kmfarris/imol-run";
+import { ImolSyntaxError, parse, repairAgentGrammar } from "@kmfarris/imol-syntax";
+import { compareTraces, WorkshopSession } from "@kmfarris/imol-workshop";
 import { readFile, writeFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import { dirname, join, resolve } from "node:path";
@@ -22,7 +22,7 @@ import {
     printAgentJson,
 } from "./agent.js";
 import { CMD_HELP, TOP_HELP } from "./help.js";
-import { cmdSkillRoute } from "@imol/skill";
+import { cmdSkillRoute } from "@kmfarris/imol-skill";
 import { mcpToImolTools, parseMcpExport } from "./mcp-import.js";
 
 async function readSource(path: string): Promise<string> {
@@ -340,7 +340,7 @@ async function main(): Promise<number> {
                 return cmdSkillRoute(task, file, k, oracle);
             }
             if (sub === "mcp") {
-                const serverPath = fileURLToPath(import.meta.resolve("@imol/skill/mcp"));
+                const serverPath = fileURLToPath(import.meta.resolve("@kmfarris/imol-skill/mcp"));
                 const code = await new Promise<number>((res) => {
                     const child = spawn(process.execPath, [serverPath], { stdio: "inherit" });
                     child.on("exit", (c) => res(c ?? 1));

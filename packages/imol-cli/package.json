@@ -1,5 +1,5 @@
 {
-  "name": "@imol/cli",
+  "name": "@kmfarris/imol-cli",
   "version": "0.1.0",
   "type": "module",
   "bin": {
@@ -12,13 +12,26 @@
   "dependencies": {
     "vscode-languageserver": "^9.0.1",
     "vscode-languageserver-textdocument": "^1.0.12",
-    "@imol/check": "0.1.0",
-    "@imol/fmt": "0.1.0",
-    "@imol/run": "0.1.0",
-    "@imol/syntax": "0.1.0",
-    "@imol/workshop": "0.1.0",
-    "@imol/patch": "0.2.0",
-    "@imol/load": "0.1.0",
-    "@imol/skill": "0.1.0"
+    "@kmfarris/imol-check": "0.1.0",
+    "@kmfarris/imol-fmt": "0.1.0",
+    "@kmfarris/imol-run": "0.1.0",
+    "@kmfarris/imol-syntax": "0.1.0",
+    "@kmfarris/imol-workshop": "0.1.0",
+    "@kmfarris/imol-patch": "0.2.0",
+    "@kmfarris/imol-load": "0.1.0",
+    "@kmfarris/imol-skill": "0.1.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kmfarris/imol.git",
+    "directory": "packages/imol-cli"
+  },
+  "homepage": "https://github.com/kmfarris/imol",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }

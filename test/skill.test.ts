@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { buildCodebookFromInventory } from "@imol/skill";
-import { CODewORD_ENTRIES } from "@imol/skill";
-import { routeSkills } from "@imol/skill";
+import { buildCodebookFromInventory } from "@kmfarris/imol-skill";
+import { CODewORD_ENTRIES } from "@kmfarris/imol-skill";
+import { routeSkills } from "@kmfarris/imol-skill";
 
-describe("@imol/skill", () => {
+describe("@kmfarris/imol-skill", () => {
     it("inventory has 40+ codewords", () => {
         expect(CODewORD_ENTRIES.length).toBeGreaterThanOrEqual(40);
     });

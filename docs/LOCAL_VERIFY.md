@@ -37,6 +37,6 @@ Output: `packages/imol-skill/codebook/router-weights.json`.
 
 ```bash
 npm run build
-npm pack -w @imol/cli --dry-run
-npm pack -w @imol/skill --dry-run
+npm pack -w @kmfarris/imol-cli --dry-run
+npm pack -w @kmfarris/imol-skill --dry-run
 ```

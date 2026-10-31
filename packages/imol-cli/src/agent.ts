@@ -1,4 +1,4 @@
-import { agentFail } from "@imol/skill/oracle";
+import { agentFail } from "@kmfarris/imol-skill/oracle";
 
 export {
     AGENT_SPEC_VERSION,
@@ -13,7 +13,7 @@ export {
     defaultLoadModule,
     type AgentError,
     type LoadModuleFn,
-} from "@imol/skill/oracle";
+} from "@kmfarris/imol-skill/oracle";
 
 export function printAgentJson(value: object): void {
     console.log(JSON.stringify(value));

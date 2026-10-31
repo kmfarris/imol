@@ -1,9 +1,9 @@
-import { checkModule, diagnosticsToJson } from "@imol/check";
+import { checkModule, diagnosticsToJson } from "@kmfarris/imol-check";
 import { loadCodebook } from "../codebook/load.js";
 import { callChatModel } from "../llm/call-model.js";
 import { loadRouterWeights } from "../router/weights.js";
 import { routeSkills } from "../router/route.js";
-import { parse } from "@imol/syntax";
+import { parse } from "@kmfarris/imol-syntax";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import {

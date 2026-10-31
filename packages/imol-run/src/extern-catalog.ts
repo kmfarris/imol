@@ -5,4 +5,4 @@ export {
     KNOWN_EXTERN_KEYS,
     type ExternEffect,
     type ExternMeta,
-} from "@imol/syntax";
+} from "@kmfarris/imol-syntax";

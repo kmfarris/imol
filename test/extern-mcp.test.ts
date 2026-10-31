@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { checkModule } from "@imol/check";
-import { parse } from "@imol/syntax";
-import { isExternAllowed, isKnownExternKey } from "@imol/syntax";
+import { checkModule } from "@kmfarris/imol-check";
+import { parse } from "@kmfarris/imol-syntax";
+import { isExternAllowed, isKnownExternKey } from "@kmfarris/imol-syntax";
 
 describe("mcp.* extern catalog", () => {
     it("recognizes dynamic mcp keys", () => {

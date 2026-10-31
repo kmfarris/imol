@@ -1,8 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { checkModule } from "@imol/check";
-import { loadModuleFromFile } from "@imol/load";
+import { checkModule } from "@kmfarris/imol-check";
+import { loadModuleFromFile } from "@kmfarris/imol-load";
 import { loadCodebook } from "../codebook/load.js";
 import { callChatModel } from "../llm/call-model.js";
 import { loadRouterWeights } from "../router/weights.js";
@@ -38,7 +38,7 @@ export type LlmBenchResult = {
 async function checkFileRel(relPath: string, source?: string): Promise<boolean> {
     const abs = join(repoRoot, relPath);
     if (source !== undefined) {
-        const { parse } = await import("@imol/syntax");
+        const { parse } = await import("@kmfarris/imol-syntax");
         const mod = parse(source);
         return checkModule(mod).ok;
     }

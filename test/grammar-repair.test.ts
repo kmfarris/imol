@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parse, parseWithRepair, removeOrphanAtIdBeforePlan, repairAgentGrammar } from "@imol/syntax";
+import { parse, parseWithRepair, removeOrphanAtIdBeforePlan, repairAgentGrammar } from "@kmfarris/imol-syntax";
 
 describe("grammar repair", () => {
     it("removes @id line before plan", () => {

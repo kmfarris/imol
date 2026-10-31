@@ -2,8 +2,8 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { checkModule } from "@imol/check";
-import { parse } from "@imol/syntax";
+import { checkModule } from "@kmfarris/imol-check";
+import { parse } from "@kmfarris/imol-syntax";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 

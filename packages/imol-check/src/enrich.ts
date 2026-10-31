@@ -1,4 +1,4 @@
-import { buildDeclIndex, findDeclIdForSpan, type ModuleDecl } from "@imol/syntax";
+import { buildDeclIndex, findDeclIdForSpan, type ModuleDecl } from "@kmfarris/imol-syntax";
 import type { Diagnostic } from "./diagnostic.js";
 
 export type DiagnosticJson = {

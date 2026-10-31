@@ -1,4 +1,4 @@
-import { parse, type ImportDecl, type ModuleDecl } from "@imol/syntax";
+import { parse, type ImportDecl, type ModuleDecl } from "@kmfarris/imol-syntax";
 import { readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 

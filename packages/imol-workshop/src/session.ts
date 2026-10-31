@@ -1,12 +1,12 @@
-import { checkModule } from "@imol/check";
+import { checkModule } from "@kmfarris/imol-check";
 import {
     runCapabilities,
     createExternRegistry,
     runModule,
     runPlanDryRun,
     type TraceEntry,
-} from "@imol/run";
-import type { ModuleDecl } from "@imol/syntax";
+} from "@kmfarris/imol-run";
+import type { ModuleDecl } from "@kmfarris/imol-syntax";
 import { appendFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 

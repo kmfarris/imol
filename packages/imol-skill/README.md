@@ -1,4 +1,4 @@
-# @imol/skill — IMOL Skill Dictionary (CSD)
+# @kmfarris/imol-skill — IMOL Skill Dictionary (CSD)
 
 Host-side flat codebook + router + packet compiler for closed-model APIs. Replaces stuffing full SPEC into context.
 
@@ -67,7 +67,7 @@ Without a key, `llm_eval.skipped` is true (CI-safe).
 
 ## Layout
 
-- `codebook/v0.4.json` — flat codeword table (built via `npm run codebook:build -w @imol/skill`)
+- `codebook/v0.4.json` — flat codeword table (built via `npm run codebook:build -w @kmfarris/imol-skill`)
 - `codebook/codebook-schema.json` — JSON schema
 - `codebook/router-weights.json` — trained sparse router (after `skill:train`)
 - `bench/scenarios.json` — IMOL-AgentBench scenarios + baseline definitions

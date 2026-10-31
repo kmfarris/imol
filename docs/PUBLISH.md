@@ -1,15 +1,15 @@
 # Publishing IMOL packages
 
-Monorepo workspace packages share semver **0.1.x** today. Bump **all** `@imol/*` dependencies together before release.
+Monorepo workspace packages share semver **0.1.x** today. Bump **all** `@kmfarris/imol-*` dependencies together before release.
 
 ## Publish targets
 
 | Package | npm name | Bin |
 |---------|----------|-----|
-| CLI | `@imol/cli` | `imol` |
-| Skill + MCP | `@imol/skill` | `imol-mcp` |
+| CLI | `@kmfarris/imol-cli` | `imol` |
+| Skill + MCP | `@kmfarris/imol-skill` | `imol-mcp` |
 
-Library packages (`@imol/syntax`, `@imol/check`, `@imol/run`, …) are dependencies of the two publish targets. Publish them in dependency order if you split releases; for a first release, publishing CLI + skill with pinned workspace versions is enough if consumers install only those bins.
+Library packages (`@kmfarris/imol-syntax`, `@kmfarris/imol-check`, `@kmfarris/imol-run`, …) are dependencies of the two publish targets. Publish them in dependency order if you split releases; for a first release, publishing CLI + skill with pinned workspace versions is enough if consumers install only those bins.
 
 ## Before first publish
 
@@ -20,20 +20,20 @@ Library packages (`@imol/syntax`, `@imol/check`, `@imol/run`, …) are dependenc
 
 ```bash
 npm run build
-npm pack -w @imol/cli --dry-run
-npm pack -w @imol/skill --dry-run
+npm pack -w @kmfarris/imol-cli --dry-run
+npm pack -w @kmfarris/imol-skill --dry-run
 ```
 
 ## Consumer install
 
 ```bash
-npx @imol/cli check path/to/file.imol
+npx @kmfarris/imol-cli check path/to/file.imol
 ```
 
 MCP without cloning the repo:
 
 ```bash
-npx @imol/skill
+npx @kmfarris/imol-skill
 # bin: imol-mcp (stdio MCP server)
 ```
 
@@ -44,7 +44,7 @@ For Cursor, prefer a small launcher that sets `IMOL_WORKSPACE_ROOT` (same patter
   "mcpServers": {
     "imol": {
       "command": "npx",
-      "args": ["-y", "@imol/skill"],
+      "args": ["-y", "@kmfarris/imol-skill"],
       "env": { "IMOL_WORKSPACE_ROOT": "${workspaceFolder}" }
     }
   }
@@ -59,6 +59,6 @@ Run pack dry-run locally (see [LOCAL_VERIFY.md](LOCAL_VERIFY.md)). This repo doe
 
 ## Version coupling
 
-- Root `package.json` `bin.imol` points at built CLI for local dev; published `@imol/cli` uses its own `bin` field.
-- `@imol/cli` depends on `@imol/skill@0.1.0` (etc.); bump in lockstep.
-- Codebook files ship inside `@imol/skill`; run `npm run codebook:build -w @imol/skill` before pack.
+- Root `package.json` `bin.imol` points at built CLI for local dev; published `@kmfarris/imol-cli` uses its own `bin` field.
+- `@kmfarris/imol-cli` depends on `@kmfarris/imol-skill@0.1.0` (etc.); bump in lockstep.
+- Codebook files ship inside `@kmfarris/imol-skill`; run `npm run codebook:build -w @kmfarris/imol-skill` before pack.

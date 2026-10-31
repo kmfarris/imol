@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { checkModule } from "@imol/check";
-import { applyPatches } from "@imol/patch";
-import { buildDeclIndex, parse } from "@imol/syntax";
+import { checkModule } from "@kmfarris/imol-check";
+import { applyPatches } from "@kmfarris/imol-patch";
+import { buildDeclIndex, parse } from "@kmfarris/imol-syntax";
 
 describe("@id on types", () => {
     it("indexes type declarations", () => {

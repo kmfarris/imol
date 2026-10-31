@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { checkModule } from "@imol/check";
-import { createExternRegistry, runCapabilities } from "@imol/run";
-import { parse } from "@imol/syntax";
+import { checkModule } from "@kmfarris/imol-check";
+import { createExternRegistry, runCapabilities } from "@kmfarris/imol-run";
+import { parse } from "@kmfarris/imol-syntax";
 
 const shellPreview = `module shell_preview
 

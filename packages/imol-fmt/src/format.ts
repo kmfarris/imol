@@ -1,4 +1,4 @@
-import { parse } from "@imol/syntax";
+import { parse } from "@kmfarris/imol-syntax";
 import type {
     Attribute,
     Expr,
@@ -12,7 +12,7 @@ import type {
     TypeDecl,
     TypeExpr,
     WorkshopDecl,
-} from "@imol/syntax";
+} from "@kmfarris/imol-syntax";
 
 function formatType(t: TypeExpr): string {
     switch (t.kind) {

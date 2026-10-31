@@ -1,6 +1,6 @@
-import { attachDeclIds, checkModule, diagnosticsToJson } from "@imol/check";
-import { loadModuleFromFile } from "@imol/load";
-import { ImolSyntaxError } from "@imol/syntax";
+import { attachDeclIds, checkModule, diagnosticsToJson } from "@kmfarris/imol-check";
+import { loadModuleFromFile } from "@kmfarris/imol-load";
+import { ImolSyntaxError } from "@kmfarris/imol-syntax";
 import {
     createConnection,
     TextDocuments,

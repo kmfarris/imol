@@ -1,10 +1,10 @@
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it, beforeEach } from "vitest";
-import { buildCodebookFromInventory } from "@imol/skill";
-import { routeSkills } from "@imol/skill";
-import { handleAgentCheck, handleSkillRoute } from "@imol/skill/mcp/tools";
-import { assertPathAllowed, setWorkspaceRoot } from "@imol/skill/mcp/paths";
+import { buildCodebookFromInventory } from "@kmfarris/imol-skill";
+import { routeSkills } from "@kmfarris/imol-skill";
+import { handleAgentCheck, handleSkillRoute } from "@kmfarris/imol-skill/mcp/tools";
+import { assertPathAllowed, setWorkspaceRoot } from "@kmfarris/imol-skill/mcp/paths";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 

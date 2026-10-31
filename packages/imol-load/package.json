@@ -1,5 +1,5 @@
 {
-  "name": "@imol/load",
+  "name": "@kmfarris/imol-load",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -14,6 +14,19 @@
     "build": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@imol/syntax": "0.1.0"
+    "@kmfarris/imol-syntax": "0.1.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kmfarris/imol.git",
+    "directory": "packages/imol-load"
+  },
+  "homepage": "https://github.com/kmfarris/imol",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }
