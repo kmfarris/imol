@@ -1,8 +1,22 @@
 # IMOL
 
-LLM-native language and live **Workshop** runtime: typed tools, effect checks, audit trace.
+LLMs edit source by emitting diffs and tool calls. The file often breaks before anyone runs the typechecker: half a declaration, duplicated `@id`, a plan block that invokes write before the module parses. **IMOL** is a language and runtime built for that loop—typed tools, effect tags, canonical formatting as the IR, patches keyed by declaration UUID, and a **workshop** session that traces plan invokes in dry-run before anything hits disk.
 
-## Quick start (5 minutes)
+Cursor and other hosts integrate through **`imol agent`** JSON on stdout and MCP tools (`imol_agent_check`, `imol_agent_patch`, `imol_agent_workshop_plan`) so the model gets pass/fail oracles instead of guessing from stderr.
+
+## Status
+
+| Area | State |
+|------|--------|
+| Parser, checker, fmt, patch, run, workshop | Shipped in monorepo packages; **`npm run check`** (build + vitest + conformance) green |
+| Language surface | Spec **0.5** — shell (`std.shell.exec`), async invoke preview, workshop/plan semantics |
+| Agent / MCP JSON | Spec **0.4** on stdout — schema in [`packages/imol-spec/agent-api.json`](packages/imol-spec/agent-api.json) |
+| Skill codebook + router | CSD codewords, `imol skill route`, MCP skill host ([`packages/imol-skill`](packages/imol-skill)) |
+| Formal semantics / npm publish | Not claimed; publish tooling may live on feature branches |
+
+Design notes: [`docs/DESIGN.md`](docs/DESIGN.md) · terminal walkthrough: [`docs/DEMO.md`](docs/DEMO.md)
+
+## Quick start
 
 ```bash
 npm install
@@ -11,44 +25,31 @@ npm run imol -- check examples/greet.imol
 npm run imol -- agent check examples/dogfood/catalog.imol
 ```
 
-Configure Cursor MCP from [`.cursor/mcp.json`](.cursor/mcp.json), reload tools, then call **`imol_skill_prepare`** on `examples/greet.imol`. Full dogfood + MCP loop: **[docs/HAPPY_PATH.md](docs/HAPPY_PATH.md)** and **[docs/ONBOARDING.md](docs/ONBOARDING.md)**.
-
-Runtime preview (shell/async roadmap): **[docs/ROADMAP_RUNTIME.md](docs/ROADMAP_RUNTIME.md)**.
-
-More examples:
+Cursor MCP: [`.cursor/mcp.json`](.cursor/mcp.json) · dogfood loop: [`docs/HAPPY_PATH.md`](docs/HAPPY_PATH.md), [`docs/ONBOARDING.md`](docs/ONBOARDING.md) · runtime roadmap: [`docs/ROADMAP_RUNTIME.md`](docs/ROADMAP_RUNTIME.md).
 
 ```bash
 npm run imol -- run examples/hello.imol
 npm run imol -- workshop examples/workshop_read.imol --dry-run
-npm run imol -- check --json examples/greet.imol
 npm run imol -- run examples/plan_demo.imol --approve
-npm run imol -- run examples/dogfood/catalog.imol --approve
 npm run conformance
 ```
 
 ## Agent loop (Cursor)
 
-Prefer MCP oracle tools when the **imol** server is green: `imol_skill_prepare` → edit / `imol_agent_patch` → `imol_agent_check` → `imol_agent_workshop_plan`.
+MCP when the **imol** server is connected: `imol_skill_prepare` → edit / `imol_agent_patch` → `imol_agent_check` → `imol_agent_workshop_plan`.
 
-CLI equivalents:
+CLI: `imol agent check` · `imol agent patch` · `imol agent workshop-plan` · real execution only with `imol run --approve` / `imol workshop --approve`.
 
-1. `imol agent check [file]` — JSON diagnostics before editing IMOL.
-2. `imol agent patch <file> <patches.json>` — apply patches in memory; verify nested `check`.
-3. `imol agent workshop-plan [file]` — dry-run plan invokes; inspect `trace` before side effects.
-4. Use `imol run --approve` / `imol workshop --approve` only when the user wants real execution.
-
-See `.cursor/rules/imol.mdc` and `packages/imol-spec/agent-api.json`.
+See `.cursor/rules/imol.mdc`.
 
 ## Skill dictionary (CSD)
-
-Closed-model hosts can inject a minimal packet instead of full SPEC:
 
 ```bash
 npm run imol -- skill route "patch greet by @id" --file examples/greet.imol
 npm run skill:bench
 ```
 
-MCP (production stdio): configure Cursor with [packages/imol-skill/mcp/cursor-mcp.example.json](packages/imol-skill/mcp/cursor-mcp.example.json), then use tools `imol_skill_prepare`, `imol_agent_check`, etc. See [packages/imol-skill/README.md](packages/imol-skill/README.md).
+MCP example config: [`packages/imol-skill/mcp/cursor-mcp.example.json`](packages/imol-skill/mcp/cursor-mcp.example.json) · [`packages/imol-skill/README.md`](packages/imol-skill/README.md)
 
 ## Repository layout
 
@@ -60,12 +61,6 @@ MCP (production stdio): configure Cursor with [packages/imol-skill/mcp/cursor-mc
 - `packages/imol-cli` — `imol` command
 - `packages/imol-patch` — `@id` patch application
 - `packages/imol-load` — manifest + multi-file import
-- `packages/imol-spec` — language spec (0.5 surface, 0.4 agent JSON); see [`docs/DESIGN.md`](docs/DESIGN.md)
-- `packages/imol-skill` — flat skill codebook (CSD), router, `imol skill route`, MCP host
+- `packages/imol-spec` — language spec (0.5 surface, 0.4 agent JSON)
+- `packages/imol-skill` — skill codebook, router, MCP
 - `examples/` — sample programs (`bad/`, `golden/`)
-
-## Remote
-
-```bash
-git remote add origin git@github.com:kmfarris/imol.git
-```
