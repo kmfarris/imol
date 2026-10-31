@@ -1,6 +1,6 @@
 # Why IMOL is shaped this way
 
-An assistant that writes code usually proposes a patch or a tool call against a file that may not even parse. IMOL’s purpose is to put **structure in front of mutation**: parse, diagnose, format, then edit or preview side effects.
+AI coding assistants usually change a file by writing text into it, often before anyone has confirmed the new code is valid or what it will do. IMOL is designed so the safe steps come first: check the program for mistakes, edit it by permanent name tags rather than line numbers, rehearse its actions, and only then let it change anything. This document explains each step in more technical detail.
 
 ## Three jobs
 
