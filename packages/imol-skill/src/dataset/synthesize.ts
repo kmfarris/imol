@@ -2,7 +2,7 @@
 import { checkModule } from "@imol/check";
 import { parse } from "@imol/syntax";
 import { mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { codewordsForDiagnostics } from "../router/route.js";
 import type { TrajectoryStep } from "../types.js";
@@ -124,7 +124,7 @@ async function main(): Promise<void> {
             const fromDiag = codewordsForDiagnostics(diagnostics);
             const codeword_ids = [...new Set([...tpl.codewords, ...fromDiag])];
             steps.push({
-                query: `${tpl.query} (context: ${path})`,
+                query: `${tpl.query} (context: ${relative(repoRoot, path)})`,
                 codeword_ids,
                 ok,
                 diagnostics,
