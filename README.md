@@ -1,8 +1,46 @@
-# IMOL
+# IMOL: a programming language built for AI coding assistants
 
-LLM-native language and live **Workshop** runtime: typed tools, effect checks, audit trace.
+## What it is
 
-## Quick start (5 minutes)
+IMOL is a programming language and a set of tools designed so that AI assistants can write and change programs safely.
+
+## The problem
+
+When an AI assistant writes or edits code today, it usually produces plain text that gets dropped into a file. Three things tend to go wrong:
+
+- **Mistakes are found late.** The new code may not even be valid, and nobody finds out until the program runs.
+- **Edits miss their target.** An edit that says "change lines 40 to 62" breaks as soon as anything above those lines moves.
+- **Actions happen too early.** A program can delete files, overwrite data, or contact the internet before anyone has looked at what it intends to do.
+
+## How it works
+
+- **Permanent name tags.** Every part of an IMOL program, such as a function or a tool, can carry a permanent tag. An assistant edits by tag ("replace this function") instead of by line number, so edits still land in the right place after the file changes.
+- **Check before saving.** IMOL checks a program for mistakes before any change is written to disk. Problems come back in a structured format the assistant can read, so it can fix its own errors and try again.
+- **Declared permissions.** Each program states up front what it's allowed to do: read files, write files, use the network, or run system commands. Anything not declared is blocked.
+- **Rehearsal mode.** A program can be run as a rehearsal that records every action it *would* take, such as which files it would read or write, without doing any of them. Real actions only happen after explicit approval.
+
+Together, these let an assistant propose a change, confirm it's valid, show exactly what it will do, and act only once a person says yes.
+
+## Results so far
+
+- The language, the mistake checker, the tag-based editor, the formatter, and the rehearsal runtime all work.
+- The full automated test suite passes.
+- IMOL connects to the Cursor code editor, so an AI assistant there can run these checks itself.
+- A built-in guide helps assistants pick the right command for a task without reading the whole language manual.
+
+## Still to do
+
+- The language has gained new features (running system commands, early support for doing work in the background) faster than the format it uses to report back to assistants. The two need to be brought back in step.
+- IMOL isn't yet published as a package that can be installed with one command.
+- There's no formal written definition of the language yet.
+
+Design notes: [`docs/DESIGN.md`](docs/DESIGN.md) · walkthrough: [`docs/DEMO.md`](docs/DEMO.md)
+
+---
+
+## For developers
+
+Install, build, and check an example:
 
 ```bash
 npm install
@@ -11,61 +49,48 @@ npm run imol -- check examples/greet.imol
 npm run imol -- agent check examples/dogfood/catalog.imol
 ```
 
-Configure Cursor MCP from [`.cursor/mcp.json`](.cursor/mcp.json), reload tools, then call **`imol_skill_prepare`** on `examples/greet.imol`. Full dogfood + MCP loop: **[docs/HAPPY_PATH.md](docs/HAPPY_PATH.md)** and **[docs/ONBOARDING.md](docs/ONBOARDING.md)**.
-
-Runtime preview (shell/async roadmap): **[docs/ROADMAP_RUNTIME.md](docs/ROADMAP_RUNTIME.md)**.
-
 More examples:
 
 ```bash
 npm run imol -- run examples/hello.imol
 npm run imol -- workshop examples/workshop_read.imol --dry-run
-npm run imol -- check --json examples/greet.imol
 npm run imol -- run examples/plan_demo.imol --approve
-npm run imol -- run examples/dogfood/catalog.imol --approve
-npm run conformance
 ```
 
-## Agent loop (Cursor)
+Run everything (build, tests, and example checks):
 
-Prefer MCP oracle tools when the **imol** server is green: `imol_skill_prepare` → edit / `imol_agent_patch` → `imol_agent_check` → `imol_agent_workshop_plan`.
+```bash
+npm run check
+```
 
-CLI equivalents:
+### Using it from Cursor
 
-1. `imol agent check [file]` — JSON diagnostics before editing IMOL.
-2. `imol agent patch <file> <patches.json>` — apply patches in memory; verify nested `check`.
-3. `imol agent workshop-plan [file]` — dry-run plan invokes; inspect `trace` before side effects.
-4. Use `imol run --approve` / `imol workshop --approve` only when the user wants real execution.
+Cursor connects through [`.cursor/mcp.json`](.cursor/mcp.json). A typical assistant sequence is: prepare (`imol_skill_prepare`), edit (`imol_agent_patch`), check (`imol_agent_check`), rehearse (`imol_agent_workshop_plan`). Real side effects only run with `imol run --approve` or `imol workshop --approve`.
 
-See `.cursor/rules/imol.mdc` and `packages/imol-spec/agent-api.json`.
+Guides: [`docs/HAPPY_PATH.md`](docs/HAPPY_PATH.md), [`docs/ONBOARDING.md`](docs/ONBOARDING.md), [`docs/ROADMAP_RUNTIME.md`](docs/ROADMAP_RUNTIME.md).
 
-## Skill dictionary (CSD)
-
-Closed-model hosts can inject a minimal packet instead of full SPEC:
+### Command guide for assistants
 
 ```bash
 npm run imol -- skill route "patch greet by @id" --file examples/greet.imol
 npm run skill:bench
 ```
 
-MCP (production stdio): configure Cursor with [packages/imol-skill/mcp/cursor-mcp.example.json](packages/imol-skill/mcp/cursor-mcp.example.json), then use tools `imol_skill_prepare`, `imol_agent_check`, etc. See [packages/imol-skill/README.md](packages/imol-skill/README.md).
+Example editor config: [`packages/imol-skill/mcp/cursor-mcp.example.json`](packages/imol-skill/mcp/cursor-mcp.example.json)
 
-## Repository layout
+### Packages
 
-- `packages/imol-syntax` — lexer, parser, AST
-- `packages/imol-fmt` — canonical formatter (IR)
-- `packages/imol-check` — type and effect checker
-- `packages/imol-run` — tree-walk interpreter
-- `packages/imol-workshop` — session, trace, dry-run
-- `packages/imol-cli` — `imol` command
-- `packages/imol-patch` — `@id` patch application
-- `packages/imol-load` — manifest + multi-file import
-- `packages/imol-spec` — language spec (0.4), agent API JSON
-- `packages/imol-skill` — flat skill codebook (CSD), router, `imol skill route`, MCP host
-- `examples/` — sample programs (`bad/`, `golden/`)
+| Package | What it does |
+|---------|--------------|
+| `imol-syntax` | Reads IMOL source into a structure the other tools use |
+| `imol-fmt` | Puts every program into one standard layout |
+| `imol-check` | Finds type mistakes and undeclared actions |
+| `imol-run` | Runs programs |
+| `imol-workshop` | Rehearsal mode and action records |
+| `imol-cli` | The `imol` command |
+| `imol-patch` | Edits by name tag |
+| `imol-load` | Project files and multi-file programs |
+| `imol-spec` | Language reference and assistant message format |
+| `imol-skill` | Command guide for assistants and editor connection |
 
-## Remote
-
-```bash
-git remote add origin git@github.com:kmfarris/imol.git
-```
+Sample programs are in `examples/`, including deliberately broken ones in `bad/`.

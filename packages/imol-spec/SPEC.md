@@ -1,4 +1,7 @@
-# IMOL spec_version 0.5
+# IMOL language specification
+
+**Language surface:** spec_version **0.5** (shell, async preview, workshop semantics below).  
+**Agent stdout JSON:** spec_version **0.4** (schema in [agent-api.json](agent-api.json)). Bump the agent API only with a documented migration; language features may advance independently.
 
 IMOL is a language for LLM-authored programs and tool orchestration. Canonical formatted source is the IR.
 
