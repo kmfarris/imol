@@ -9,11 +9,11 @@ Monorepo workspace packages share semver **0.1.x** today. Bump **all** `@kmfarri
 | CLI | `@kmfarris/imol-cli` | `imol` |
 | Skill + MCP | `@kmfarris/imol-skill` | `imol-mcp` |
 
-Library packages (`@kmfarris/imol-syntax`, `@kmfarris/imol-check`, `@kmfarris/imol-run`, …) are dependencies of the two publish targets. Publish them in dependency order if you split releases; for a first release, publishing CLI + skill with pinned workspace versions is enough if consumers install only those bins.
+Library packages (`@kmfarris/imol-syntax`, `@kmfarris/imol-check`, `@kmfarris/imol-run`, …) are dependencies of the two publish targets and must be on npm before them. Publish in dependency order: syntax, fmt, check, load, patch, run, workshop, skill, cli.
 
 ## Before first publish
 
-1. Remove `"private": true` from the **root** `package.json` only when you intend to publish; keep `"private": true` until then.
+1. Keep `"private": true` on the **root** `package.json`; the root workspace is never published.
 2. Ensure each publish package has `name`, `version`, `files` or default `dist/`, and `repository` if desired.
 3. Run `npm run build` and `npm run check`.
 4. Dry-run pack locally before tagging:
